@@ -1,0 +1,121 @@
+<!-- 
+This is a fork of the MQTT nodes from Node-RED.
+The original code can be found at:
+https://github.com/node-red/node-red/blob/9bf9b7a635aab7190c51b76f7aa3ede443da8f91/packages/node_modules/@node-red/nodes/core/network/10-mqtt.html
+Below is the copyright notice for the original code.
+The copyright notice for this fork is the same as the original.
+### Changes:
+- Hide advanced features
+- Remove the config node for MQTT broker
+- Remove the dynamic connection control
+-->
+<!--
+  Copyright JS Foundation and other contributors, http://js.foundation
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<script type="text/html" data-help-name="ff-mqtt-in">
+<p>Automatically connects to the FlowFuse MQTT broker and subscribes to messages from the specified topic.</p>
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+       <dt>payload <span class="property-type">string | buffer</span></dt>
+       <dd>a string unless detected as a binary buffer.</dd>
+       <dt>topic <span class="property-type">string</span></dt>
+       <dd>the MQTT topic, uses / as a hierarchy separator.</dd>
+       <dt>qos <span class="property-type">number</span> </dt>
+       <dd>0, fire and forget - 1, at least once - 2, once and once only.</dd>
+       <dt>retain <span class="property-type">boolean</span></dt>
+       <dd>true indicates the message was retained and may be old.</dd>
+
+       <dt class="optional">responseTopic <span class="property-type">string</span></dt>
+       <dd><b>MQTTv5</b>: the MQTT response topic for the message</dd>
+       <dt class="optional">correlationData <span class="property-type">Buffer</span></dt>
+       <dd><b>MQTTv5</b>: the correlation data for the message</dd>
+       <dt class="optional">contentType <span class="property-type">string</span></dt>
+       <dd><b>MQTTv5</b>: the content-type of the payload</dd>
+       <dt class="optional">userProperties <span class="property-type">object</span></dt>
+       <dd><b>MQTTv5</b>: any user properties of the message</dd>
+       <dt class="optional">messageExpiryInterval <span class="property-type">number</span></dt>
+       <dd><b>MQTTv5</b>: the expiry time, in seconds, of the message</dd>
+    </dl>
+    <h3>Details</h3>
+    The subscription topic can include MQTT wildcards, + for one level, # for multiple levels.</p>
+    <p>All FlowFuse MQTT nodes (in or out) share the same broker connection.</p>
+    <h4>Dynamic Subscription</h4>
+    The node can be configured to dynamically control the MQTT connection and its subscriptions. When
+    enabled, the node will have an input and can be controlled by passing it messages.
+    <h3>Inputs</h3>
+    <p>These only apply when the node has been configured for dynamic subscriptions.</p>
+    <dl class="message-properties">
+       <dt>action <span class="property-type">string</span></dt>
+       <dd>the name of the action the node should perform. Available actions are: <code>"connect"</code>,
+       <code>"disconnect"</code>, <code>"getSubscriptions"</code>, <code>"subscribe"</code> and 
+       <code>"unsubscribe"</code>.</dd>
+       <dt class="optional">topic <span class="property-type">string|object|array</span></dt>
+       <dd>For the <code>"subscribe"</code> and <code>"unsubscribe"</code> actions, this property
+           provides the topic. It can be set as either:<ul>
+           <li>a String containing the topic filter</li>
+           <li>an Object containing <code>topic</code> and <code>qos</code> properties</li>
+           <li>an array of either strings or objects to handle multiple topics in one</li>
+            </ul>
+        </dd>
+        <i>NOTE: By default, the MQTT connection will be established using the settings provided by
+            the platform. These cannot be overridden by the node.</i>
+    </dl>
+
+</script>
+
+<script type="text/html" data-help-name="ff-mqtt-out">
+    <p>Automatically connects to the FlowFuse MQTT broker and publishes messages.</p>
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+       <dt>payload <span class="property-type">string | buffer</span></dt>
+       <dd> the payload to publish. If this property is not set, no message will be sent. To send a blank message, set this property to an empty String.</dd>
+       <dt class="optional">topic <span class="property-type">string</span></dt>
+       <dd> the MQTT topic to publish to.</dd>
+       <dt class="optional">qos <span class="property-type">number</span></dt>
+       <dd>0, fire and forget - 1, at least once - 2, once and once only. Default 0.</dd>
+       <dt class="optional">retain <span class="property-type">boolean</span></dt>
+       <dd>set to true to retain the message on the broker. Default false.</dd>
+       <dt class="optional">responseTopic <span class="property-type">string</span></dt>
+       <dd><b>MQTTv5</b>: the MQTT response topic for the message</dd>
+       <dt class="optional">correlationData <span class="property-type">Buffer</span></dt>
+       <dd><b>MQTTv5</b>: the correlation data for the message</dd>
+       <dt class="optional">contentType <span class="property-type">string</span></dt>
+       <dd><b>MQTTv5</b>: the content-type of the payload</dd>
+       <dt class="optional">userProperties <span class="property-type">object</span></dt>
+       <dd><b>MQTTv5</b>: any user properties of the message</dd>
+       <dt class="optional">messageExpiryInterval <span class="property-type">number</span></dt>
+       <dd><b>MQTTv5</b>: the expiry time, in seconds, of the message</dd>
+       <dt class="optional">topicAlias <span class="property-type">number</span></dt>
+       <dd><b>MQTTv5</b>: the MQTT topic alias to use</dd>
+    </dl>
+    <h3>Details</h3>
+    <code>msg.payload</code> is used as the payload of the published message.
+    If it contains an Object it will be converted to a JSON string before being sent.
+    If it contains a binary Buffer the message will be published as-is.</p>
+    <p>The topic used can be configured in the node or, if left blank, can be set by <code>msg.topic</code>.</p>
+    <p>Likewise the QoS and retain values can be configured in the node or, if left
+    blank, set by <code>msg.qos</code> and <code>msg.retain</code> respectively. To clear a previously
+    retained topic from the broker, send a blank message to that topic with the retain flag set.</p>
+    <p>This node requires the connection to the FlowFuse broker to be configured.</p>
+    <p>All FlowFuse MQTT nodes (in or out) share the same broker connection.</p>
+    <h4>Dynamic Control</h4>
+    The connection shared by the node can be controlled dynamically. If the node receives
+    one of the following control messages, it will not publish the message payload as well.
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+       <dt>action <span class="property-type">string</span></dt>
+       <dd>the name of the action the node should perform. Available actions are: <code>"connect"</code>,
+       and <code>"disconnect"</code>.</dd>
+    </dl>
+
+</script>

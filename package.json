@@ -1,0 +1,52 @@
+{
+    "name": "@flowfuse/nr-mqtt-nodes",
+    "version": "0.1.0",
+    "description": "MQTT nodes for FlowFuse",
+    "main": "nodes/ff-mqtt.js",
+    "scripts": {
+        "test": "mocha test/unit/**/*_spec.js --timeout 5000",
+        "lint": "eslint -c .eslintrc --ext js,html \"nodes/**/*.js\" \"nodes/**/*.html\"   \"lib/**/*.js\" \"test/**/*.js\"",
+        "lint:fix": "eslint -c .eslintrc --ext js,html \"nodes/**/*.js\" \"nodes/**/*.html\"   \"lib/**/*.js\" \"test/**/*.js\" --fix"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/FlowFuse/nr-mqtt-nodes.git"
+    },
+    "author": "FlowFuse Inc.",
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/FlowFuse/nr-mqtt-nodes/issues"
+    },
+    "homepage": "https://github.com/FlowFuse/nr-mqtt-nodes#readme",
+    "dependencies": {
+        "got": "^11.8.6",
+        "http-proxy-agent": "^7.0.2",
+        "https-proxy-agent": "^7.0.6",
+        "mqtt": "^4.3.7",
+        "proxy-from-env": "^1.1.0"
+    },
+    "devDependencies": {
+        "eslint": "^8.25.0",
+        "eslint-config-standard": "^17.0.0",
+        "eslint-plugin-html": "7.1.0",
+        "eslint-plugin-no-only-tests": "^3.1.0",
+        "mocha": "^11.6.0",
+        "mocha-cli": "^1.0.1",
+        "node-red": "^4.1.0",
+        "node-red-node-test-helper": "^0.3.5",
+        "sinon": "^18.0.0"
+    },
+    "keywords": [
+        "node-red",
+        "flowfuse",
+        "mqtt"
+    ],
+    "node-red": {
+        "nodes": {
+            "ff-mqtt": "nodes/ff-mqtt.js"
+        }
+    },
+    "engines": {
+        "node": ">=16.x"
+    }
+}
