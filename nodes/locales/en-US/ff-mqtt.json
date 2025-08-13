@@ -16,7 +16,8 @@
             "disconnected": "disconnected",
             "connecting": "connecting",
             "error": "error",
-            "ok": "OK"
+            "ok": "OK",
+            "featureDisabled": "feature not enabled"
         },
         "notification": {
             "error": "<strong>Error</strong>: __message__",
@@ -128,7 +129,8 @@
             "invalid-action-alreadyconnected": "Disconnect from broker before connecting",
             "invalid-action-badsubscription": "msg.topic is missing or invalid",
             "invalid-client-id": "Missing Client ID",
-            "subscription-failed": "Failed to subscribe to topic: __topic__"
+            "subscription-failed": "Failed to subscribe to topic: __topic__",
+            "featureDisabled": "FlowFuse Broker Feature not enabled for this instance"
         }
     }
 }

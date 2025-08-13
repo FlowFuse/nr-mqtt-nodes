@@ -21,14 +21,8 @@ module.exports = function (RED) {
     'use strict'
 
     const forgeSettings = RED.settings.flowforge || {}
-    if (!forgeSettings.teamID) {
-        throw new Error('FlowFuse MQTT nodes cannot be loaded outside of an FlowFuse EE environment')
-    }
-    const mqttSettings = forgeSettings.mqttNodes || forgeSettings.projectLink
-    if (!mqttSettings || !mqttSettings.broker) {
-        throw new Error('FlowFuse MQTT nodes cannot be loaded without a broker configured in FlowFuse EE settings')
-    }
-
+    const mqttSettings = forgeSettings.mqttNodes || forgeSettings.projectLink // when linked, mqttNodes will be populated. Falls back to projectLink for runtime initiation
+    const featureEnabled = mqttSettings.teamBrokerEnabled !== false
     const teamId = forgeSettings.teamID
     const deviceId = forgeSettings.deviceID || ''
     const projectId = forgeSettings.instanceID || forgeSettings.projectID || ''
@@ -38,11 +32,14 @@ module.exports = function (RED) {
     // therefore, assume project owned if `projectID` is set
     // eslint-disable-next-line no-unused-vars
     const DEVICE_OWNER_TYPE = forgeSettings.projectID ? 'instance' : 'application'
-
     // Generate a unique ID based on the hostname
     // This is then used when in HA/sharedSubscription mode to ensure the instance has
     // a unique clientId that is stable across restarts
     const haInstanceId = HA_INSTANCE ? crypto.createHash('md5').update(os.hostname()).digest('hex').substring(0, 4) : null
+
+    if (!forgeSettings.teamID) {
+        throw new Error('FlowFuse MQTT nodes cannot be loaded outside of an FlowFuse EE environment')
+    }
 
     let instanceType = ''
     let instanceId = ''
@@ -72,11 +69,11 @@ module.exports = function (RED) {
     const MAX_LINK_ATTEMPTS = 5
     sharedBroker.linkMonitorInterval = setInterval(async function () {
         if (Object.keys(sharedBroker.users).length < 1) {
-            return // no users, no need to link
+            return // no users registered (yet)
         }
-
         if (sharedBroker.linked && !sharedBroker.linkFailed) {
-            return
+            clearInterval(sharedBroker.linkMonitorInterval)
+            sharedBroker.linkMonitorInterval = null
         }
         if (sharedBroker.linkFailed) {
             try {
@@ -461,15 +458,27 @@ module.exports = function (RED) {
         setStatus(node, allNodes)
     }
 
+    function setStatusFeatureDisabled (node, allNodes) {
+        if (allNodes) {
+            for (const id in node.users) {
+                if (hasProperty(node.users, id)) {
+                    node.users[id].status({ fill: 'red', shape: 'ring', text: 'common.status.featureDisabled' })
+                }
+            }
+        } else {
+            node.status({ fill: 'red', shape: 'ring', text: 'common.status.featureDisabled' })
+        }
+    }
+
     function setStatusDisconnected (node, allNodes) {
         if (allNodes) {
             for (const id in node.users) {
                 if (hasProperty(node.users, id)) {
-                    node.users[id].status({ fill: 'red', shape: 'ring', text: 'node-red:common.status.disconnected' })
+                    node.users[id].status({ fill: 'red', shape: 'ring', text: 'common.status.disconnected' })
                 }
             }
         } else {
-            node.status({ fill: 'red', shape: 'ring', text: 'node-red:common.status.disconnected' })
+            node.status({ fill: 'red', shape: 'ring', text: 'common.status.disconnected' })
         }
     }
 
@@ -477,11 +486,11 @@ module.exports = function (RED) {
         if (allNodes) {
             for (const id in node.users) {
                 if (hasProperty(node.users, id)) {
-                    node.users[id].status({ fill: 'yellow', shape: 'ring', text: 'node-red:common.status.connecting' })
+                    node.users[id].status({ fill: 'yellow', shape: 'ring', text: 'common.status.connecting' })
                 }
             }
         } else {
-            node.status({ fill: 'yellow', shape: 'ring', text: 'node-red:common.status.connecting' })
+            node.status({ fill: 'yellow', shape: 'ring', text: 'common.status.connecting' })
         }
     }
 
@@ -489,11 +498,11 @@ module.exports = function (RED) {
         if (allNodes) {
             for (const id in node.users) {
                 if (hasProperty(node.users, id)) {
-                    node.users[id].status({ fill: 'green', shape: 'dot', text: 'node-red:common.status.connected' })
+                    node.users[id].status({ fill: 'green', shape: 'dot', text: 'common.status.connected' })
                 }
             }
         } else {
-            node.status({ fill: 'green', shape: 'dot', text: 'node-red:common.status.connected' })
+            node.status({ fill: 'green', shape: 'dot', text: 'common.status.connected' })
         }
     }
 
@@ -505,6 +514,10 @@ module.exports = function (RED) {
      */
     function handleConnectAction (node, msg, done) {
         const actionData = ALLOW_DYNAMIC_CONNECT_OPTIONS && (typeof msg.broker === 'object' ? msg.broker : null)
+        if (!featureEnabled) {
+            node.error('Team Broker is not enabled in this FlowFuse EE environment', msg)
+            return
+        }
         if (node.brokerConn.canConnect()) {
             // Not currently connected/connecting - trigger the connect
             if (actionData) {
@@ -565,6 +578,7 @@ module.exports = function (RED) {
         })
         Object.defineProperty(node, 'linked', {
             get: function () {
+                sharedBroker._linked = forgeSettings.mqttNodes // once an instance is linked, settings will be delivered in `mqttNodes` property
                 return node._linked
             }
         })
@@ -587,12 +601,15 @@ module.exports = function (RED) {
         /** @type {mqtt.MqttClient} */
         node.client = null
         node.linkPromise = null
-        node._linked = false
+        node._linked = !!forgeSettings.mqttNodes // once an instance is linked, settings will be delivered in `mqttNodes` property
         node._linkFailed = false
 
         node.link = async function () {
             if (node.linkPromise) {
                 return node.linkPromise // already linking, return the existing promise
+            }
+            if (!featureEnabled) {
+                return false
             }
             const teamBrokerApi = TeamBrokerApi.TeamBrokerApi(got, {
                 forgeURL: forgeSettings.forgeURL,
@@ -607,6 +624,10 @@ module.exports = function (RED) {
                 node.linkPromise = null // reset the link promise
                 node._linkFailed = false
                 node._linked = true
+                if (node._initialised === false) {
+                    node.initialise()
+                    node.connect()
+                }
                 return node._linked
             } catch (err) {
                 const code = err.code || err.statusCode || err.status || 'unknown'
@@ -627,10 +648,13 @@ module.exports = function (RED) {
                 }
                 node._initialising = true
 
-                const featureEnabled = forgeSettings.teamBrokerEnabled !== false
                 if (!featureEnabled) {
-                    throw new Error('Teambroker is not enabled in this FlowFuse EE environment')
+                    throw new Error('Team Broker is not enabled in this FlowFuse EE environment')
                 }
+                if (!mqttSettings || !mqttSettings.broker) {
+                    throw new Error('FlowFuse MQTT nodes cannot be loaded without a broker configured in FlowFuse EE settings')
+                }
+
                 const settings = {
                     url: mqttSettings.broker.url || ''
                 }
@@ -902,9 +926,23 @@ module.exports = function (RED) {
         // Define functions called by MQTT in and out nodes
         node.registerAsync = async function (mqttNode) {
             node.users[mqttNode.id] = mqttNode
+            if (!featureEnabled) {
+                setStatusFeatureDisabled(node, true)
+            }
             if (Object.keys(node.users).length === 1) {
+                if (!featureEnabled) {
+                    node.error('Team Broker is not enabled in this FlowFuse EE environment')
+                    return
+                }
                 try {
-                    await node.link()
+                    if (!node.linked) {
+                        await node.link()
+                    }
+                } catch (err) {
+                    const error = new Error('Failed to link FlowFuse MQTT node', { cause: err })
+                    node.error(error)
+                }
+                try {
                     node.initialise()
                     node.connect()
                 } catch (err) {
@@ -923,7 +961,7 @@ module.exports = function (RED) {
         node.deregister = function (mqttNode, done, autoDisconnect) {
             setStatusDisconnected(mqttNode, false)
             delete node.users[mqttNode.id]
-            if (autoDisconnect && !node.closing && node.connected && Object.keys(node.users).length === 0) {
+            if (autoDisconnect && !node.closing && (node.connected || node.connecting) && Object.keys(node.users).length === 0) {
                 node.disconnect(done)
             } else {
                 done()
@@ -941,7 +979,7 @@ module.exports = function (RED) {
             })
         }
         node.canConnect = function () {
-            return !node.connected && !node.connecting
+            return !node.connected && !node.connecting && featureEnabled
         }
         node.connect = function (callback) {
             if (node.canConnect()) {
@@ -1536,7 +1574,7 @@ module.exports = function (RED) {
                         }, node.id)
                     }
                     if (node.brokerConn.connected) {
-                        node.status({ fill: 'green', shape: 'dot', text: 'node-red:common.status.connected' })
+                        node.status({ fill: 'green', shape: 'dot', text: 'common.status.connected' })
                     }
                 }).catch((err) => {
                     node.error(err)
@@ -1671,6 +1709,10 @@ module.exports = function (RED) {
 
     RED.nodes.registerType('ff-mqtt-in', MQTTInNode, {
         settings: {
+            ffMqttInFeatureEnabled: {
+                value: featureEnabled,
+                exportable: true // make available in the editor
+            },
             ffMqttInForgeUrl: {
                 value: forgeSettings.forgeURL,
                 exportable: true // make available in the editor
@@ -1737,7 +1779,7 @@ module.exports = function (RED) {
                 }
             })
             if (node.brokerConn.connected) {
-                node.status({ fill: 'green', shape: 'dot', text: 'node-red:common.status.connected' })
+                node.status({ fill: 'green', shape: 'dot', text: 'common.status.connected' })
             }
             node.brokerConn.registerAsync(node)
             node.on('close', async function (removed, done) {
@@ -1763,6 +1805,10 @@ module.exports = function (RED) {
     }
     RED.nodes.registerType('ff-mqtt-out', MQTTOutNode, {
         settings: {
+            ffMqttOutFeatureEnabled: {
+                value: featureEnabled,
+                exportable: true // make available in the editor
+            },
             ffMqttOutForgeUrl: {
                 value: forgeSettings.forgeURL,
                 exportable: true // make available in the editor

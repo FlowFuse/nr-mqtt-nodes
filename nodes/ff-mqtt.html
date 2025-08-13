@@ -91,6 +91,10 @@ The copyright notice for this fork is the same as the original.
 </style>
 
 <script type="text/html" data-template-name="ff-mqtt-in">
+    <div class="form-row" id="ff-mqtt-client-link-feature-disabled" style="color: var(--red-ui-text-color-error);">
+        <label><i class="fa fa-warning"></i> <span></span></label>
+        <span data-i18n="ff-mqtt.label.featureDisabled"></span>
+    </div>
     <div class="form-row">
         <label><i class="fa fa-globe"></i> <span data-i18n="ff-mqtt.label.broker"></span></label>
         <span class="red-ui-help">
@@ -161,6 +165,10 @@ The copyright notice for this fork is the same as the original.
 </script>
 
 <script type="text/html" data-template-name="ff-mqtt-out">
+    <div class="form-row" id="ff-mqtt-client-link-feature-disabled" style="color: var(--red-ui-text-color-error);">
+        <label><i class="fa fa-warning"></i> <span></span></label>
+        <span data-i18n="ff-mqtt.label.featureDisabled"></span>
+    </div>
     <div class="form-row">
         <label><i class="fa fa-globe"></i> <span data-i18n="ff-mqtt.label.broker"></span></label>
         <span class="red-ui-help">
@@ -327,6 +335,12 @@ The copyright notice for this fork is the same as the original.
 
             const forgeUrl = RED.settings.ffMqttInUserTeamBrokerClientUrl || RED.settings.ffMqttInForgeUrl || ''
             $('#ff-mqtt-client-link').attr('href', forgeUrl)
+            const featureEnabled = RED.settings.ffMqttInFeatureEnabled !== false || RED.settings.ffMqttOutFeatureEnabled !== false
+            if (featureEnabled === false) {
+                $("#ff-mqtt-client-link-feature-disabled").show();
+            } else {
+                $("#ff-mqtt-client-link-feature-disabled").hide();
+            }
 
             setupTopicField(node, $('#node-input-topic'))
             const isV5Broker = function () {
@@ -402,6 +416,12 @@ The copyright notice for this fork is the same as the original.
             const that = this
             const forgeUrl = RED.settings.ffMqttOutUserTeamBrokerClientUrl || RED.settings.ffMqttOutForgeUrl || ''
             $('#ff-mqtt-client-link').attr('href', forgeUrl)
+            const featureEnabled = RED.settings.ffMqttInFeatureEnabled !== false || RED.settings.ffMqttOutFeatureEnabled !== false
+            if (featureEnabled === false) {
+                $("#ff-mqtt-client-link-feature-disabled").show();
+            } else {
+                $("#ff-mqtt-client-link-feature-disabled").hide();
+            }
 
             setupTopicField(that, $('#node-input-topic'))
 
