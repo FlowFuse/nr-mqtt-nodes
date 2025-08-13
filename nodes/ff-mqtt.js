@@ -1729,7 +1729,6 @@ module.exports = function (RED) {
                 value: `${forgeSettings.forgeURL}/team-by-id/${teamId}/brokers/team-broker/client?searchQuery=${instanceId}`,
                 exportable: true // make available in the editor
             }
-
         }
     })
     // #endregion  "MQTTIn node"
