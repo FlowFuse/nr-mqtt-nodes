@@ -513,7 +513,7 @@ module.exports = function (RED) {
      */
     function handleConnectAction (node, msg, done) {
         const actionData = ALLOW_DYNAMIC_CONNECT_OPTIONS && (typeof msg.broker === 'object' ? msg.broker : null)
-        if (!featureEnabled) {
+        if (!featureEnabled || !mqttSettings.broker) {
             node.error('Team Broker is not enabled in this FlowFuse EE environment', msg)
             return
         }
@@ -606,7 +606,7 @@ module.exports = function (RED) {
             if (node.linkPromise) {
                 return node.linkPromise // already linking, return the existing promise
             }
-            if (!featureEnabled) {
+            if (!featureEnabled || !mqttSettings.broker) {
                 return false
             }
             const teamBrokerApi = TeamBrokerApi.TeamBrokerApi(got, {
@@ -646,15 +646,12 @@ module.exports = function (RED) {
                 }
                 node._initialising = true
 
-                if (!featureEnabled) {
+                if (!featureEnabled || !mqttSettings.broker) {
                     throw new Error('Team Broker is not enabled in this FlowFuse EE environment')
-                }
-                if (!mqttSettings || !mqttSettings.broker) {
-                    throw new Error('FlowFuse MQTT nodes cannot be loaded without a broker configured in FlowFuse EE settings')
                 }
 
                 const settings = {
-                    url: mqttSettings.broker.url || ''
+                    broker: mqttSettings.broker.url || ''
                 }
                 node.credentials = {
                     user: TEAM_CLIENT_AUTH_ID,
@@ -924,11 +921,11 @@ module.exports = function (RED) {
         // Define functions called by MQTT in and out nodes
         node.registerAsync = async function (mqttNode) {
             node.users[mqttNode.id] = mqttNode
-            if (!featureEnabled) {
+            if (!featureEnabled || !mqttSettings.broker) {
                 setStatusFeatureDisabled(node, true)
             }
             if (Object.keys(node.users).length === 1) {
-                if (!featureEnabled) {
+                if (!featureEnabled || !mqttSettings.broker) {
                     node.error('Team Broker is not enabled in this FlowFuse EE environment')
                     return
                 }
@@ -978,7 +975,7 @@ module.exports = function (RED) {
             })
         }
         node.canConnect = function () {
-            return !node.connected && !node.connecting && featureEnabled
+            return !node.connected && !node.connecting && featureEnabled && mqttSettings.broker
         }
         node.connect = function (callback) {
             if (node.canConnect()) {
