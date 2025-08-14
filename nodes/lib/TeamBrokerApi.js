@@ -1,5 +1,3 @@
-const API_TIMEOUT = 5000
-
 /**
  * @typedef {Object} LinkResult
  * @property {string} id - The ID of the broker client
@@ -27,40 +25,25 @@ const API_TIMEOUT = 5000
  * const forgeURL = 'https://example.com/forge';
  * const teamBrokerApi = TeamBrokerApi(RED, got, { forgeURL, teamId: "abcdef", token: "your-token" });
  */
-function TeamBrokerApi (gotClient, { forgeURL, teamId, instanceType, instanceId, token, API_VERSION = 'v1' } = {}) {
+function TeamBrokerApi (gotClient, { forgeURL, teamId, instanceType, instanceId, token, API_VERSION = 'v1', API_TIMEOUT = 5000 } = {}) {
     const teamClientUserId = `${instanceType}:${instanceId}`
-    const url = `${forgeURL}/api/${API_VERSION}/teams/${teamId}/broker/client/${teamClientUserId}/link`
+    const baseURL = `${forgeURL}/api/${API_VERSION}/teams/${teamId}/broker/client`
+    const got = gotClient.extend({
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        timeout: {
+            request: API_TIMEOUT
+        }
+    })
 
     /**
-     * Get broker clients for team
-     * @returns {Promise<Array>} - Returns an array of broker clients
-     * @throws {Error} - Throws an error if the request fails
+     * Get the broker client user information
+     * @returns {Promise<Object>} - The broker client information
      */
-    async function getClients () {
-        const res = await gotClient.get(`${forgeURL}/api/${API_VERSION}/teams/${teamId}/broker/client`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            },
-            timeout: {
-                request: API_TIMEOUT
-            }
-        })
-        if (res.statusCode !== 200) {
-            throw new Error(`Failed to fetch clients: ${res.statusCode} ${res.statusMessage}`)
-        }
-        const data = JSON.parse(res.body)
-        return data
-    }
-
     async function getClient () {
-        const res = await gotClient.get(`${forgeURL}/api/${API_VERSION}/teams/${teamId}/broker/client/${teamClientUserId}`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            },
-            timeout: {
-                request: API_TIMEOUT
-            }
-        })
+        const url = `${baseURL}/${teamClientUserId}`
+        const res = await got.get(url)
         if (res.statusCode !== 200) {
             throw new Error(`Failed to fetch client: ${res.statusCode} ${res.statusMessage}`)
         }
@@ -75,15 +58,11 @@ function TeamBrokerApi (gotClient, { forgeURL, teamId, instanceType, instanceId,
      * @throws {Error} - Throws an error if the request fails
      */
     async function link (password) {
-        const res = await gotClient.post(url, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            },
+        const url = `${baseURL}/${teamClientUserId}/link`
+        console.debug(`Linking instance to broker client via URL: ${url}`)
+        const res = await got.post(url, {
             json: {
                 password
-            },
-            timeout: {
-                request: API_TIMEOUT
             }
         })
         if (res.statusCode !== 200 && res.statusCode !== 201) {
@@ -93,29 +72,9 @@ function TeamBrokerApi (gotClient, { forgeURL, teamId, instanceType, instanceId,
         return data
     }
 
-    /**
-     * Unlink this instance from the broker client
-     * @returns {Promise<void>} - Returns nothing on success
-     * @throws {Error} - Throws an error if the request fails
-     */
-    async function unlink () {
-        const res = await gotClient.delete(url, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            },
-            timeout: {
-                request: API_TIMEOUT
-            }
-        })
-        if (res.statusCode !== 204) {
-            throw new Error(`Failed to unlink instances: ${res.statusCode} ${res.statusMessage}`)
-        }
-    }
     return {
-        getClients,
         getClient,
-        link,
-        unlink
+        link
     }
 }
 
