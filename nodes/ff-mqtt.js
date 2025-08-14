@@ -936,6 +936,7 @@ module.exports = function (RED) {
                 }
                 try {
                     if (!node.linked) {
+                        node.log('Auto linking FlowFuse MQTT node')
                         await node.link()
                     }
                 } catch (err) {
@@ -1455,36 +1456,36 @@ module.exports = function (RED) {
             /** @type {function} */
             node.status = (options) => options
         }
+
+        // Provide logging functions for this shared broker client via RED.log
+        const decorateDebugMsg = (msg) => {
+            if (typeof msg === 'object' && msg.message) {
+                msg = msg.message
+            }
+            if (!msg.includes('FlowFuse MQTT')) {
+                msg = `FlowFuse MQTT Nodes Client: ${msg}`
+            }
+            return msg
+        }
         // mimic the node.warn function if it is not already defined
         if (typeof node.warn !== 'function') {
             /** @type {function} */
             node.warn = (msg) => {
-                if (typeof msg === 'string') {
-                    msg = `[ff-mqtt-broker] ${msg}`
-                }
-                RED.log.warn(msg)
+                RED.log.warn(decorateDebugMsg(msg))
             }
         }
         // mimic the node.error function if it is not already defined
         if (typeof node.error !== 'function') {
             /** @type {function} */
             node.error = (msg, _msg) => {
-                if (typeof msg === 'string') {
-                    msg = `[ff-mqtt-broker] ${msg}`
-                } else if (typeof msg === 'object' && msg.message) {
-                    msg = `[ff-mqtt-broker] ${msg.message}`
-                }
-                RED.log.error(msg, _msg)
+                RED.log.error(decorateDebugMsg(msg), _msg)
             }
         }
         // mimic the node.log function if it is not already defined
         if (typeof node.log !== 'function') {
             /** @type {function} */
             node.log = (msg) => {
-                if (typeof msg === 'string') {
-                    msg = `[ff-mqtt-broker] ${msg}`
-                }
-                RED.log.info(msg)
+                RED.log.info(decorateDebugMsg(msg))
             }
         }
 
