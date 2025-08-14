@@ -19,27 +19,26 @@ const Got = require('got').default
 
 module.exports = function (RED) {
     'use strict'
-
     const forgeSettings = RED.settings.flowforge || {}
-    const mqttSettings = forgeSettings.mqttNodes || forgeSettings.projectLink // when linked, mqttNodes will be populated. Falls back to projectLink for runtime initiation
-    const featureEnabled = mqttSettings.teamBrokerEnabled !== false
+    const mqttSettings = forgeSettings.mqttNodes || {}
+    const featureEnabled = !!mqttSettings.featureEnabled
     const teamId = forgeSettings.teamID
-    const deviceId = forgeSettings.deviceID || ''
+    const deviceId = forgeSettings.deviceId || ''
     const projectId = forgeSettings.instanceID || forgeSettings.projectID || ''
-    const HA_INSTANCE = forgeSettings.projectLink?.useSharedSubscriptions
+    // ensure settings are present
+    if (!teamId || (!deviceId && !projectId)) {
+        throw new Error('FlowFuse MQTT nodes cannot be loaded outside of an FlowFuse EE environment')
+    }
+    const HA_INSTANCE = !!deviceId && mqttSettings?.ha >= 2
     // It is not unreasonable to expect `projectID` and `applicationID` are set for an instance
     // owned device, however an application owned device should not have a projectID.
     // therefore, assume project owned if `projectID` is set
     // eslint-disable-next-line no-unused-vars
-    const DEVICE_OWNER_TYPE = forgeSettings.projectID ? 'instance' : 'application'
+    const DEVICE_OWNER_TYPE = deviceId ? (forgeSettings.projectID ? 'instance' : 'application') : null
     // Generate a unique ID based on the hostname
     // This is then used when in HA/sharedSubscription mode to ensure the instance has
     // a unique clientId that is stable across restarts
     const haInstanceId = HA_INSTANCE ? crypto.createHash('md5').update(os.hostname()).digest('hex').substring(0, 4) : null
-
-    if (!forgeSettings.teamID) {
-        throw new Error('FlowFuse MQTT nodes cannot be loaded outside of an FlowFuse EE environment')
-    }
 
     let instanceType = ''
     let instanceId = ''
@@ -62,7 +61,7 @@ module.exports = function (RED) {
     })
 
     /** @type {MQTTBrokerNode} */
-    const sharedBroker = new MQTTBrokerNode()
+    const sharedBroker = new MQTTBrokerNode(mqttSettings)
 
     /* Monitor link status and attept to relink if node has users but is unlinked */
     let linkTryCount = 0
@@ -578,7 +577,6 @@ module.exports = function (RED) {
         })
         Object.defineProperty(node, 'linked', {
             get: function () {
-                sharedBroker._linked = forgeSettings.mqttNodes // once an instance is linked, settings will be delivered in `mqttNodes` property
                 return node._linked
             }
         })
@@ -601,7 +599,7 @@ module.exports = function (RED) {
         /** @type {mqtt.MqttClient} */
         node.client = null
         node.linkPromise = null
-        node._linked = !!forgeSettings.mqttNodes // once an instance is linked, settings will be delivered in `mqttNodes` property
+        node._linked = mqttSettings.linked || false
         node._linkFailed = false
 
         node.link = async function () {
