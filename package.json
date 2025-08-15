@@ -5,8 +5,8 @@
     "main": "nodes/ff-mqtt.js",
     "scripts": {
         "test": "mocha test/unit/**/*_spec.js --timeout 5000",
-        "lint": "eslint -c .eslintrc --ext js,html \"nodes/**/*.js\" \"nodes/**/*.html\"   \"lib/**/*.js\" \"test/**/*.js\"",
-        "lint:fix": "eslint -c .eslintrc --ext js,html \"nodes/**/*.js\" \"nodes/**/*.html\"   \"lib/**/*.js\" \"test/**/*.js\" --fix"
+        "lint": "eslint -c .eslintrc --ext js,html \"nodes/**/*.js\" \"nodes/**/*.html\" \"test/**/*.js\"",
+        "lint:fix": "eslint -c .eslintrc --ext js,html \"nodes/**/*.js\" \"nodes/**/*.html\" \"test/**/*.js\" --fix"
     },
     "repository": {
         "type": "git",
