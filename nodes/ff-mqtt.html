@@ -330,16 +330,15 @@ The copyright notice for this fork is the same as the original.
             return this.name ? 'node_label_italic' : ''
         },
         oneditprepare: function () {
-            debugger
             const node = this
 
             const forgeUrl = RED.settings.ffMqttInUserTeamBrokerClientUrl || RED.settings.ffMqttInForgeUrl || ''
             $('#ff-mqtt-client-link').attr('href', forgeUrl)
             const featureEnabled = RED.settings.ffMqttInFeatureEnabled !== false || RED.settings.ffMqttOutFeatureEnabled !== false
             if (featureEnabled === false) {
-                $("#ff-mqtt-client-link-feature-disabled").show();
+                $('#ff-mqtt-client-link-feature-disabled').show()
             } else {
-                $("#ff-mqtt-client-link-feature-disabled").hide();
+                $('#ff-mqtt-client-link-feature-disabled').hide()
             }
 
             setupTopicField(node, $('#node-input-topic'))
@@ -412,15 +411,14 @@ The copyright notice for this fork is the same as the original.
             return this.name || this.topic || 'ff mqtt out'
         },
         oneditprepare: function () {
-            debugger
             const that = this
             const forgeUrl = RED.settings.ffMqttOutUserTeamBrokerClientUrl || RED.settings.ffMqttOutForgeUrl || ''
             $('#ff-mqtt-client-link').attr('href', forgeUrl)
             const featureEnabled = RED.settings.ffMqttInFeatureEnabled !== false || RED.settings.ffMqttOutFeatureEnabled !== false
             if (featureEnabled === false) {
-                $("#ff-mqtt-client-link-feature-disabled").show();
+                $('#ff-mqtt-client-link-feature-disabled').show()
             } else {
-                $("#ff-mqtt-client-link-feature-disabled").hide();
+                $('#ff-mqtt-client-link-feature-disabled').hide()
             }
 
             setupTopicField(that, $('#node-input-topic'))
