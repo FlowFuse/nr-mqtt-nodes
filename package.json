@@ -21,7 +21,7 @@
     },
     "homepage": "https://github.com/FlowFuse/nr-mqtt-nodes#readme",
     "dependencies": {
-        "got": "^11.8.6",
+        "got": "^14.4.7",
         "http-proxy-agent": "^7.0.2",
         "https-proxy-agent": "^7.0.6",
         "is-utf8": "^0.2.1",
