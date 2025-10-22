@@ -1421,10 +1421,8 @@ module.exports = function (RED) {
                 }
 
                 if (topicOK) {
-                    node.warn(`Publishing to topic "${msg.topic}" with QoS ${options.qos} and retain ${options.retain}`, msg, options)
                     node.client.publish(msg.topic, msg.payload, options, function (err) {
                         if (done) {
-                            node.warn(`publish callback for topic "${msg.topic}" - there was ${err ? 'an error' : 'no error'}`, err)
                             done(err)
                         } else if (err) {
                             node.error(err, msg)
