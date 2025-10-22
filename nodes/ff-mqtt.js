@@ -1790,7 +1790,22 @@ module.exports = function (RED) {
                         done(new Error(RED._('ff-mqtt.errors.invalid-action-action')))
                     }
                 } else {
-                    doPublish(node, msg, done)
+                    doPublish(node, msg, function (err) {
+                        if (err) {
+                            let text = 'common.status.error'
+                            if (err.code === 135 || (err.message?.toLowerCase?.().includes('not authorized'))) {
+                                text = 'common.status.publishNotAuthorized'
+                            }
+                            if (node.__lastErrorMessage !== text) {
+                                setErrorStatus(node, false, { fill: 'red', shape: 'ring', text })
+                                node.__lastErrorMessage = text
+                            }
+                        } else if (node.__lastErrorMessage) {
+                            updateStatus(node, false)
+                            node.__lastErrorMessage = null
+                        }
+                        done(err)
+                    })
                 }
             })
             if (node.brokerConn.connected) {
