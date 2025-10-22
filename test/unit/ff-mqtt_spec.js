@@ -149,7 +149,7 @@ describe('FF MQTT Nodes', function () {
             publish: sinon.stub(),
             end: sinon.stub()
         }
-        mqttBroker.publish(testMsg, () => {})
+        mqttOut.receive(testMsg)
         mqttBroker.client.publish.calledOnce.should.be.true()
         mqttBroker.client.publish.getCall(0).args[0].should.equal('out_topic')
         mqttBroker.client.publish.getCall(0).args[1].should.equal('test message')
@@ -159,9 +159,9 @@ describe('FF MQTT Nodes', function () {
         clearInterval(mqttBroker.linkMonitorInterval) // clear the link monitor interval so the test can exit
     })
 
-    it('should publish with specified QoS 2 and retain values when specified', async function () {
+    it('should publish with specified QoS and retain values', async function () {
         this.timeout = 2000
-        const { flow } = buildBasicMQTTSendRecvFlow({ id: 'mqtt.in', topic: 'in_topic' }, { id: 'mqtt.out', topic: 'out_topic' })
+        const { flow } = buildBasicMQTTSendRecvFlow({ id: 'mqtt.in', topic: 'in_topic' }, { id: 'mqtt.out', topic: '' })
         await helper.load(mqttNodes, flow)
 
         const mqttOut = helper.getNode('mqtt.out')
@@ -181,12 +181,12 @@ describe('FF MQTT Nodes', function () {
             publish: sinon.stub(),
             end: sinon.stub()
         }
-        mqttBroker.publish(testMsg, () => {})
+        mqttOut.receive(testMsg)
         mqttBroker.client.publish.calledOnce.should.be.true()
         mqttBroker.client.publish.getCall(0).args[0].should.equal('out_topic2')
         mqttBroker.client.publish.getCall(0).args[1].should.equal('test message2')
-        mqttBroker.client.publish.getCall(0).args[2].should.have.property('qos', 2) // default QoS 2
-        mqttBroker.client.publish.getCall(0).args[2].should.have.property('retain', true) // default retain true
+        mqttBroker.client.publish.getCall(0).args[2].should.have.property('qos', 2) // non default QoS 2
+        mqttBroker.client.publish.getCall(0).args[2].should.have.property('retain', true) // non default retain true
         mqttBroker.client = originalClient
         clearInterval(mqttBroker.linkMonitorInterval) // clear the link monitor interval so the test can exit
     })
