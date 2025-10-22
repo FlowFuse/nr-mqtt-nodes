@@ -129,6 +129,36 @@ describe('FF MQTT Nodes', function () {
         clearInterval(mqttBroker.linkMonitorInterval) // clear the link monitor interval so the test can exit
     })
 
+    it('should publish with QoS 1 and retain false by default', async function () {
+        this.timeout = 2000
+        const { flow } = buildBasicMQTTSendRecvFlow({ id: 'mqtt.in', topic: 'in_topic' }, { id: 'mqtt.out', topic: 'out_topic' })
+        await helper.load(mqttNodes, flow)
+
+        const mqttOut = helper.getNode('mqtt.out')
+        const mqttBroker = mqttOut.brokerConn
+
+        const testMsg = {
+            topic: 'out_topic',
+            payload: 'test message'
+        }
+
+        // fake state to allow client.publish to work
+        mqttBroker.connected = true
+        const originalClient = mqttBroker.client
+        mqttBroker.client = {
+            publish: sinon.stub(),
+            end: sinon.stub()
+        }
+        mqttBroker.publish(testMsg, () => {})
+        mqttBroker.client.publish.calledOnce.should.be.true()
+        mqttBroker.client.publish.getCall(0).args[0].should.equal('out_topic')
+        mqttBroker.client.publish.getCall(0).args[1].should.equal('test message')
+        mqttBroker.client.publish.getCall(0).args[2].should.have.property('qos', 1) // default QoS 1
+        mqttBroker.client.publish.getCall(0).args[2].should.have.property('retain', false) // default retain false
+        mqttBroker.client = originalClient
+        clearInterval(mqttBroker.linkMonitorInterval) // clear the link monitor interval so the test can exit
+    })
+
     if (skipTests) {
         it('skipping MQTT tests. Set env var "NR_MQTT_TESTS=true" to enable. Requires a v5 capable broker running on localhost:1883.', function (done) {
             done()
