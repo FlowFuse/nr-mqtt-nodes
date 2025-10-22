@@ -409,7 +409,8 @@ module.exports = function (RED) {
 
             /* If node properties exists, override/set that to property in msg  */
             if (node.topic) { msg.topic = node.topic }
-            msg.qos = Number(node.qos || msg.qos || 0)
+            msg.qos = Number(node.qos || msg.qos)
+            msg.qos = [0, 1, 2].includes(msg.qos) ? msg.qos : 1 // default QoS 1
             msg.retain = node.retain || msg.retain || false
             msg.retain = ((msg.retain === true) || (msg.retain === 'true')) || false
 
@@ -1420,8 +1421,10 @@ module.exports = function (RED) {
                 }
 
                 if (topicOK) {
+                    node.warn(`Publishing to topic "${msg.topic}" with QoS ${options.qos} and retain ${options.retain}`, msg, options)
                     node.client.publish(msg.topic, msg.payload, options, function (err) {
                         if (done) {
+                            node.warn(`publish callback for topic "${msg.topic}" - there was ${err ? 'an error' : 'no error'}`, err)
                             done(err)
                         } else if (err) {
                             node.error(err, msg)
