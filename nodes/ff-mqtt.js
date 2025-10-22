@@ -506,6 +506,18 @@ module.exports = function (RED) {
         }
     }
 
+    function setErrorStatus (node, allNodes, { fill = 'red', shape = 'ring', text } = {}) {
+        if (allNodes) {
+            for (const id in node.users) {
+                if (hasProperty(node.users, id)) {
+                    node.users[id].status({ fill, shape, text: text || 'common.status.error' })
+                }
+            }
+        } else {
+            node.status({ fill, shape, text: text || 'common.status.error' })
+        }
+    }
+
     /**
      * Perform the connect action
      * @param {MQTTInNode|MQTTOutNode} node
