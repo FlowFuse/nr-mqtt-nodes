@@ -1433,7 +1433,14 @@ module.exports = function (RED) {
                 }
 
                 if (topicOK) {
-                    node.client.publish(msg.topic, msg.payload, options, function (err) {
+                    let lastMessageId = null
+                    let lastErr = null
+                    node.client.publish(msg.topic, msg.payload, options, function (err, packet) {
+                        if (lastErr && lastMessageId && packet?.messageId === lastMessageId && packet.qos === 1) {
+                            return // duplicate callback for same messageId and qos 1, ignore
+                        }
+                        lastMessageId = packet.messageId
+                        lastErr = err
                         if (done) {
                             done(err)
                         } else if (err) {
