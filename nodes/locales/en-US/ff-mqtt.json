@@ -17,7 +17,8 @@
             "connecting": "connecting",
             "error": "error",
             "ok": "OK",
-            "featureDisabled": "feature not enabled"
+            "featureDisabled": "feature not enabled",
+            "publishNotAuthorized": "not authorized"
         },
         "notification": {
             "error": "<strong>Error</strong>: __message__",
