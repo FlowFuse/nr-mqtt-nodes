@@ -450,9 +450,9 @@ module.exports = function (RED) {
 
     function updateStatus (node, allNodes) {
         let setStatus = setStatusDisconnected
-        if (node.connecting) {
+        if (sharedBroker?.connecting) {
             setStatus = setStatusConnecting
-        } else if (node.connected) {
+        } else if (sharedBroker?.connected) {
             setStatus = setStatusConnected
         }
         setStatus(node, allNodes)
@@ -503,6 +503,18 @@ module.exports = function (RED) {
             }
         } else {
             node.status({ fill: 'green', shape: 'dot', text: 'common.status.connected' })
+        }
+    }
+
+    function setErrorStatus (node, allNodes, { fill = 'red', shape = 'ring', text } = {}) {
+        if (allNodes) {
+            for (const id in node.users) {
+                if (hasProperty(node.users, id)) {
+                    node.users[id].status({ fill, shape, text: text || 'common.status.error' })
+                }
+            }
+        } else {
+            node.status({ fill, shape, text: text || 'common.status.error' })
         }
     }
 
@@ -1421,7 +1433,14 @@ module.exports = function (RED) {
                 }
 
                 if (topicOK) {
-                    node.client.publish(msg.topic, msg.payload, options, function (err) {
+                    let lastMessageId = null
+                    let lastErr = null
+                    node.client.publish(msg.topic, msg.payload, options, function (err, packet) {
+                        if (lastErr && lastMessageId && packet?.messageId === lastMessageId && packet?.qos >= 1) {
+                            return // duplicate callback for same messageId
+                        }
+                        lastMessageId = packet?.messageId // qos 0 messages do not send a packet
+                        lastErr = err
                         if (done) {
                             done(err)
                         } else if (err) {
@@ -1771,7 +1790,22 @@ module.exports = function (RED) {
                         done(new Error(RED._('ff-mqtt.errors.invalid-action-action')))
                     }
                 } else {
-                    doPublish(node, msg, done)
+                    doPublish(node, msg, function (err) {
+                        if (err) {
+                            let text = 'common.status.error'
+                            if (err.code === 135 || (err.message?.toLowerCase?.().includes('not authorized'))) {
+                                text = 'common.status.publishNotAuthorized'
+                            }
+                            if (node.__lastErrorMessage !== text) {
+                                setErrorStatus(node, false, { fill: 'red', shape: 'ring', text })
+                                node.__lastErrorMessage = text
+                            }
+                        } else if (node.__lastErrorMessage) {
+                            updateStatus(node, false)
+                            node.__lastErrorMessage = null
+                        }
+                        done(err)
+                    })
                 }
             })
             if (node.brokerConn.connected) {
