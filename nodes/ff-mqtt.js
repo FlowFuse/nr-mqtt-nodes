@@ -1375,7 +1375,7 @@ module.exports = function (RED) {
                     }
                 }
                 const options = {
-                    qos: msg.qos || 0,
+                    qos: [0, 1, 2].includes(msg.qos) ? msg.qos : 1,
                     retain: msg.retain || false
                 }
                 let topicOK = hasProperty(msg, 'topic') && (typeof msg.topic === 'string') && (isValidPublishTopic(msg.topic))

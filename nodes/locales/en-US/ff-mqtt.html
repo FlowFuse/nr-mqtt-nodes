@@ -31,7 +31,7 @@ The copyright notice for this fork is the same as the original.
        <dt>topic <span class="property-type">string</span></dt>
        <dd>the MQTT topic, uses / as a hierarchy separator.</dd>
        <dt>qos <span class="property-type">number</span> </dt>
-       <dd>0, fire and forget - 1, at least once - 2, once and once only.</dd>
+       <dd>0, fire and forget - 1, at least once - 2, once and once only. Default 2.</dd>
        <dt>retain <span class="property-type">boolean</span></dt>
        <dd>true indicates the message was retained and may be old.</dd>
 
@@ -82,7 +82,7 @@ The copyright notice for this fork is the same as the original.
        <dt class="optional">topic <span class="property-type">string</span></dt>
        <dd> the MQTT topic to publish to.</dd>
        <dt class="optional">qos <span class="property-type">number</span></dt>
-       <dd>0, fire and forget - 1, at least once - 2, once and once only. Default 0.</dd>
+       <dd>0, fire and forget - 1, at least once - 2, once and once only. Default 1.</dd>
        <dt class="optional">retain <span class="property-type">boolean</span></dt>
        <dd>set to true to retain the message on the broker. Default false.</dd>
        <dt class="optional">responseTopic <span class="property-type">string</span></dt>
