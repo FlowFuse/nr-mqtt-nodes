@@ -1436,10 +1436,10 @@ module.exports = function (RED) {
                     let lastMessageId = null
                     let lastErr = null
                     node.client.publish(msg.topic, msg.payload, options, function (err, packet) {
-                        if (lastErr && lastMessageId && packet?.messageId === lastMessageId && packet.qos === 1) {
-                            return // duplicate callback for same messageId and qos 1, ignore
+                        if (lastErr && lastMessageId && packet?.messageId === lastMessageId && packet?.qos >= 1) {
+                            return // duplicate callback for same messageId
                         }
-                        lastMessageId = packet.messageId
+                        lastMessageId = packet?.messageId // qos 0 messages do not send a packet
                         lastErr = err
                         if (done) {
                             done(err)
