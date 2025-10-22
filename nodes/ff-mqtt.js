@@ -450,9 +450,9 @@ module.exports = function (RED) {
 
     function updateStatus (node, allNodes) {
         let setStatus = setStatusDisconnected
-        if (node.connecting) {
+        if (sharedBroker?.connecting) {
             setStatus = setStatusConnecting
-        } else if (node.connected) {
+        } else if (sharedBroker?.connected) {
             setStatus = setStatusConnected
         }
         setStatus(node, allNodes)
