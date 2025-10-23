@@ -1,6 +1,6 @@
 {
     "name": "@flowfuse/nr-mqtt-nodes",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "description": "MQTT nodes for FlowFuse",
     "main": "nodes/ff-mqtt.js",
     "scripts": {
