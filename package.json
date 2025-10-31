@@ -1,6 +1,6 @@
 {
     "name": "@flowfuse/nr-mqtt-nodes",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "MQTT nodes for FlowFuse",
     "main": "nodes/ff-mqtt.js",
     "scripts": {
@@ -19,7 +19,7 @@
     "bugs": {
         "url": "https://github.com/FlowFuse/nr-mqtt-nodes/issues"
     },
-    "homepage": "https://github.com/FlowFuse/nr-mqtt-nodes#readme",
+    "homepage": "https://flowfuse.com/node-red/flowfuse/ai/",
     "dependencies": {
         "got": "^11.8.6",
         "http-proxy-agent": "^7.0.2",
