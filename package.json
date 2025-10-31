@@ -21,7 +21,7 @@
     },
     "homepage": "https://flowfuse.com/node-red/flowfuse/ai/",
     "dependencies": {
-        "got": "^11.8.6",
+        "got": "^14.6.1",
         "http-proxy-agent": "^7.0.2",
         "https-proxy-agent": "^7.0.6",
         "is-utf8": "^0.2.1",
