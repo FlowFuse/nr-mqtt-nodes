@@ -1,3 +1,7 @@
+### 0.2.1 Release
+
+ - Update homepage URL in package.json to public facing documentation (#44) @Steve-Mcl
+
 ### 0.2.0 Release
 
  - Update MQTT to v5 (#39) @Steve-Mcl
