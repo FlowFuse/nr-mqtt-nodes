@@ -19,7 +19,7 @@
     "bugs": {
         "url": "https://github.com/FlowFuse/nr-mqtt-nodes/issues"
     },
-    "homepage": "https://github.com/FlowFuse/nr-mqtt-nodes#readme",
+    "homepage": "https://flowfuse.com/node-red/flowfuse/ai/",
     "dependencies": {
         "got": "^11.8.6",
         "http-proxy-agent": "^7.0.2",
