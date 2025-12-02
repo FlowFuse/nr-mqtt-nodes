@@ -1851,4 +1851,12 @@ module.exports = function (RED) {
         }
     })
     // #endregion "MQTTOut node"
+
+    function MQTTLWTNode (n) {
+        RED.nodes.createNode(this, n)
+        const node = this
+
+    }
+
+    RED.nodes.registerType('ff-mqtt-conf', MQTTLWTNode, {})
 }

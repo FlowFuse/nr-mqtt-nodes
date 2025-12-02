@@ -227,6 +227,168 @@ The copyright notice for this fork is the same as the original.
     <div class="form-tips"><span data-i18n="ff-mqtt.tip"></span></div>
 </script>
 
+<script type="text/html" data-template-name="ff-mqtt-conf">
+    <div class="red-ui-palette-header">
+        <i class="fa fa-angle-down"></i><span data-i18n="ff-mqtt.sections-label.birth-message"></span>
+    </div>
+    <div class="section-content" style="padding:10px 0 0 10px">
+        <div class="form-row">
+            <label style="width: 100px !important;" for="node-config-input-birthTopic"><i class="fa fa-tasks"></i> <span
+                    data-i18n="common.label.topic"></span></label>
+            <input style="width: calc(100% - 300px) !important" type="text" id="node-config-input-birthTopic"
+                data-i18n="[placeholder]ff-mqtt.placeholder.birth-topic">
+            <label style="margin-left: 10px; width: 90px !important;" for="node-config-input-birthRetain"><i
+                    class="fa fa-history"></i> <span data-i18n="ff-mqtt.label.retain"></span></label>
+            <select id="node-config-input-birthRetain" style="width:75px !important">
+                <option value="false" data-i18n="ff-mqtt.false"></option>
+                <option value="true" data-i18n="ff-mqtt.true"></option>
+            </select>
+        </div>
+        <div class="form-row">
+            <label style="width: 100px !important;" for="node-config-input-birthPayload"><i class="fa fa-envelope"></i>
+                <span data-i18n="common.label.payload"></span></label>
+            <input style="width: calc(100% - 300px) !important" type="text" id="node-config-input-birthPayload"
+                style="width:300px" data-i18n="[placeholder]common.label.payload">
+            <label style="margin-left: 10px; width: 90px !important;" for="node-config-input-birthQos"><i
+                    class="fa fa-empire"></i> <span data-i18n="ff-mqtt.label.qos"></span></label>
+            <select id="node-config-input-birthQos" style="width:75px !important">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+            </select>
+        </div>
+        <div class="form-row mqtt5 mqtt5-out">
+            <label for="node-config-input-birth-contentType" data-i18n="ff-mqtt.label.contentType"></label>
+            <input type="text" style="width:calc(100% - 200px);" id="node-config-input-birth-contentType">
+        </div>
+        <div class="form-row mqtt5 mqtt5-out">
+            <label for="node-config-input-birth-props" data-i18n="ff-mqtt.label.userProperties"></label>
+            <input type="text" style="width:calc(100% - 200px);" id="node-config-input-birth-props">
+        </div>
+        <div class="form-row mqtt5 mqtt5-out">
+            <label for="node-config-input-birth-respTopic"><span data-i18n="ff-mqtt.label.responseTopic"></span></label>
+            <input type="text" id="node-config-input-birth-respTopic" style="width: calc(100% - 200px);">
+        </div>
+        <div class="form-row mqtt5 mqtt5-out">
+            <label for="node-config-input-birth-correl"><span data-i18n="ff-mqtt.label.correlationData"></span></label>
+            <input type="text" id="node-config-input-birth-correl" style="width: calc(100% - 200px);">
+        </div>
+        <div class="form-row mqtt5 mqtt5-out">
+            <label for="node-config-input-birth-expiry"><span data-i18n="ff-mqtt.label.expiry"></span></label>
+            <input id="node-config-input-birth-expiry" style="width: calc(100% - 200px);">
+        </div>
+    </div>
+    </div>
+    <div id="mqtt-broker-section-close">
+        <div class="red-ui-palette-header">
+            <i class="fa fa-angle-down"></i><span data-i18n="ff-mqtt.sections-label.close-message"></span>
+        </div>
+        <div class="section-content" style="padding:10px 0 0 10px">
+            <div class="form-row">
+                <label style="width: 100px !important;" for="node-config-input-closeTopic"><i class="fa fa-tasks"></i> <span
+                        data-i18n="common.label.topic"></span></label>
+                <input style="width: calc(100% - 300px) !important" type="text" id="node-config-input-closeTopic"
+                    style="width:300px" data-i18n="[placeholder]ff-mqtt.placeholder.close-topic">
+                <label style="margin-left: 10px; width: 90px !important;" for="node-config-input-closeRetain"><i
+                        class="fa fa-history"></i> <span data-i18n="ff-mqtt.label.retain"></span></label>
+                <select id="node-config-input-closeRetain" style="width:75px !important">
+                    <option value="false" data-i18n="ff-mqtt.false"></option>
+                    <option value="true" data-i18n="ff-mqtt.true"></option>
+                </select>
+            </div>
+            <div class="form-row">
+                <label style="width: 100px !important;" for="node-config-input-closePayload"><i class="fa fa-envelope"></i>
+                    <span data-i18n="common.label.payload"></span></label>
+                <input style="width: calc(100% - 300px) !important" type="text" id="node-config-input-closePayload"
+                    style="width:300px" data-i18n="[placeholder]common.label.payload">
+                <label style="margin-left: 10px; width: 90px !important;" for="node-config-input-closeQos"><i
+                        class="fa fa-empire"></i> <span data-i18n="mqtt.label.qos"></span></label>
+                <select id="node-config-input-closeQos" style="width:75px !important">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                </select>
+            </div>
+            <div class="form-row mqtt5 mqtt5-out">
+                <label for="node-config-input-close-contentType" data-i18n="ff-mqtt.label.contentType"></label>
+                <input type="text" style="width:calc(100% - 200px);" id="node-config-input-close-contentType">
+            </div>
+            <div class="form-row mqtt5 mqtt5-out">
+                <label for="node-config-input-close-props" data-i18n="ff-mqtt.label.userProperties"></label>
+                <input type="text" style="width:calc(100% - 200px);" id="node-config-input-close-props">
+            </div>
+            <div class="form-row mqtt5 mqtt5-out">
+                <label for="node-config-input-close-respTopic"><span data-i18n="ff-mqtt.label.responseTopic"></span></label>
+                <input type="text" id="node-config-input-close-respTopic" style="width: calc(100% - 200px);">
+            </div>
+            <div class="form-row mqtt5 mqtt5-out">
+                <label for="node-config-input-close-correl"><span data-i18n="ff-mqtt.label.correlationData"></span></label>
+                <input type="text" id="node-config-input-close-correl" style="width: calc(100% - 200px);">
+            </div>
+            <div class="form-row mqtt5 mqtt5-out">
+                <label for="node-config-input-close-expiry"><span data-i18n="ff-mqtt.label.expiry"></span></label>
+                <input id="node-config-input-close-expiry" style="width: calc(100% - 200px);">
+            </div>
+        </div>
+    </div>
+    <div id="mqtt-broker-section-will">
+        <div class="red-ui-palette-header">
+            <i class="fa fa-angle-down"></i><span data-i18n="ff-mqtt.sections-label.will-message"></span>
+        </div>
+        <div class="section-content" style="padding:10px 0 0 10px">
+            <div class="form-row">
+                <label style="width: 100px !important;" for="node-config-input-willTopic"><i class="fa fa-tasks"></i> <span
+                        data-i18n="common.label.topic"></span></label>
+                <input style="width: calc(100% - 300px) !important" type="text" id="node-config-input-willTopic"
+                    style="width:300px" data-i18n="[placeholder]ff-mqtt.placeholder.will-topic">
+                <label style="margin-left: 10px; width: 90px !important;" for="node-config-input-willRetain"><i
+                        class="fa fa-history"></i> <span data-i18n="mqtt.label.retain"></span></label>
+                <select id="node-config-input-willRetain" style="width:75px !important">
+                    <option value="false" data-i18n="ff-mqtt.false"></option>
+                    <option value="true" data-i18n="ff-mqtt.true"></option>
+                </select>
+            </div>
+            <div class="form-row">
+                <label style="width: 100px !important;" for="node-config-input-willPayload"><i class="fa fa-envelope"></i>
+                    <span data-i18n="common.label.payload"></span></label>
+                <input style="width: calc(100% - 300px) !important" type="text" id="node-config-input-willPayload"
+                    style="width:300px" data-i18n="[placeholder]common.label.payload">
+                <label style="margin-left: 10px; width: 90px !important;" for="node-config-input-willQos"><i
+                        class="fa fa-empire"></i> <span data-i18n="ff-mqtt.label.qos"></span></label>
+                <select id="node-config-input-willQos" style="width:75px !important">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                </select>
+            </div>
+            <div class="form-row mqtt5">
+                <label><span data-i18n="ff-mqtt.label.delay"></span></label>
+                <input type="number" min="0" id="node-config-input-will-delay" style="width: 100px">
+            </div>
+            <div class="form-row mqtt5 mqtt5-out">
+                <label for="node-config-input-will-contentType" data-i18n="ff-mqtt.label.contentType"></label>
+                <input type="text" style="width:calc(100% - 200px);" id="node-config-input-will-contentType">
+            </div>
+            <div class="form-row mqtt5 mqtt5-out">
+                <label for="node-config-input-will-props" data-i18n="ff-mqtt.label.userProperties"></label>
+                <input type="text" style="width:calc(100% - 200px);" id="node-config-input-will-props">
+            </div>
+            <div class="form-row mqtt5 mqtt5-out">
+                <label for="node-config-input-will-respTopic"><span data-i18n="ff-mqtt.label.responseTopic"></span></label>
+                <input type="text" id="node-config-input-will-respTopic" style="width: calc(100% - 200px);">
+            </div>
+            <div class="form-row mqtt5 mqtt5-out">
+                <label for="node-config-input-will-correl"><span data-i18n="ff-mqtt.label.correlationData"></span></label>
+                <input type="text" id="node-config-input-will-correl" style="width: calc(100% - 200px);">
+            </div>
+            <div class="form-row mqtt5 mqtt5-out">
+                <label for="node-config-input-will-expiry"><span data-i18n="ff-mqtt.label.expiry"></span></label>
+                <input id="node-config-input-will-expiry" style="width: calc(100% - 200px);">
+            </div>
+        </div>
+    </div>
+</script>
+
 <script type="text/javascript">
 /* global RED, $ */
 (function () {
@@ -482,6 +644,30 @@ The copyright notice for this fork is the same as the original.
         labelStyle: function () {
             return this.name ? 'node_label_italic' : ''
         }
+    })
+
+    RED.nodes.registerType('ff-mqtt-conf', {
+        category: 'config',
+        defaults: {
+            birthTopic: {value:"", validate:validateMQTTPublishTopic},
+            birthQos: {value:"0"},
+            birthRetain: {value:"false"},
+            birthPayload: {value:""},
+            birthMsg: { value: {}},
+            closeTopic: {value:"", validate:validateMQTTPublishTopic},
+            closeQos: {value:"0"},
+            closeRetain: {value:"false"},
+            closePayload: {value:""},
+            closeMsg: { value: {}},
+            willTopic: {value:"", validate:validateMQTTPublishTopic},
+            willQos: {value:"0"},
+            willRetain: {value:"false"},
+            willPayload: {value:""},
+            willMsg: { value: {}}
+        },
+        label: function () {
+            return 'Team Broker LWT'
+        },
     })
 })()
 </script>
