@@ -1854,8 +1854,7 @@ module.exports = function (RED) {
 
     function MQTTLWTNode (n) {
         RED.nodes.createNode(this, n)
-        const node = this
-
+        // const node = this
     }
 
     RED.nodes.registerType('ff-mqtt-conf', MQTTLWTNode, {})
