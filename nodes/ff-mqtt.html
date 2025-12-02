@@ -649,25 +649,25 @@ The copyright notice for this fork is the same as the original.
     RED.nodes.registerType('ff-mqtt-conf', {
         category: 'config',
         defaults: {
-            birthTopic: {value:"", validate:validateMQTTPublishTopic},
-            birthQos: {value:"0"},
-            birthRetain: {value:"false"},
-            birthPayload: {value:""},
-            birthMsg: { value: {}},
-            closeTopic: {value:"", validate:validateMQTTPublishTopic},
-            closeQos: {value:"0"},
-            closeRetain: {value:"false"},
-            closePayload: {value:""},
-            closeMsg: { value: {}},
-            willTopic: {value:"", validate:validateMQTTPublishTopic},
-            willQos: {value:"0"},
-            willRetain: {value:"false"},
-            willPayload: {value:""},
-            willMsg: { value: {}}
+            birthTopic: { value: '', validate: validateMQTTPublishTopic },
+            birthQos: { value: '0' },
+            birthRetain: { value: 'false' },
+            birthPayload: { value: '' },
+            birthMsg: { value: {} },
+            closeTopic: { value: '', validate: validateMQTTPublishTopic },
+            closeQos: { value: '0' },
+            closeRetain: { value: 'false' },
+            closePayload: { value: '' },
+            closeMsg: { value: {} },
+            willTopic: { value: '', validate: validateMQTTPublishTopic },
+            willQos: { value: '0' },
+            willRetain: { value: 'false' },
+            willPayload: { value: '' },
+            willMsg: { value: {} }
         },
         label: function () {
             return 'Team Broker LWT'
-        },
+        }
     })
 })()
 </script>
