@@ -537,7 +537,7 @@ The copyright notice for this fork is the same as the original.
             }
 
             $('#node-input-lwt-placeholder').on('click', function () {
-                RED.editor.editConfig('', 'ff-mqtt-conf',this.lwt)
+                RED.editor.editConfig('', 'ff-mqtt-conf', this.lwt)
             })
 
             // $('#node-input-broker').on('change', function (d) {
@@ -570,8 +570,8 @@ The copyright notice for this fork is the same as the original.
             }
         },
         onadd: function () {
-            let found = undefined
-            RED.nodes.eachConfig(function(n) {
+            let found
+            RED.nodes.eachConfig(function (n) {
                 if (n.type === 'ff-mqtt-conf') {
                     found = n.id
                 }
@@ -649,7 +649,7 @@ The copyright notice for this fork is the same as the original.
             }
 
             $('#node-input-lwt-placeholder').on('click', function () {
-                RED.editor.editConfig('', 'ff-mqtt-conf',this.lwt)
+                RED.editor.editConfig('', 'ff-mqtt-conf', this.lwt)
             })
 
             // $('#node-input-broker').on('change', function (d) {
@@ -696,8 +696,8 @@ The copyright notice for this fork is the same as the original.
             return this.name ? 'node_label_italic' : ''
         },
         onadd: function () {
-            let found = undefined
-            RED.nodes.eachConfig(function(n) {
+            let found
+            RED.nodes.eachConfig(function (n) {
                 if (n.type === 'ff-mqtt-conf') {
                     found = n.id
                 }
