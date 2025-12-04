@@ -159,6 +159,9 @@ The copyright notice for this fork is the same as the original.
         </select>
     </div>
     <div class="form-row">
+        <button id="node-input-lwt-placeholder">LWT/Birth/Death Messages</button>
+    </div>
+    <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
         <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name">
     </div>
@@ -218,6 +221,10 @@ The copyright notice for this fork is the same as the original.
     <div class="form-row mqtt-form-row-cols2 mqtt5 mqtt5-out ff-no-use">
         <label for="node-input-expiry" class="mqtt-form-row-col1"><span data-i18n="ff-mqtt.label.expiry"></span></label>
         <input id="node-input-expiry"  style="width: calc(100% - 166px);" class="mqtt-form-row-col1" >
+    </div>
+
+    <div class="form-row">
+        <button id="node-input-lwt-placeholder">LWT/Birth/Death Messages</button>
     </div>
 
     <div class="form-row">
@@ -451,6 +458,15 @@ The copyright notice for this fork is the same as the original.
             }
         })
     }
+    function mapDefaults (defaults) {
+        const values = {}
+        for (const key in defaults) {
+            if (Object.prototype.hasOwnProperty.call(defaults, key)) {
+                values[key] = defaults[key].value
+            }
+        }
+        return values
+    }
     RED.nodes.registerType('ff-mqtt-in', {
         category: 'FlowFuse',
         defaults: {
@@ -474,7 +490,8 @@ The copyright notice for this fork is the same as the original.
             nl: { value: false },
             rap: { value: true },
             rh: { value: 0 },
-            inputs: { value: 0 }
+            inputs: { value: 0 },
+            lwt: { type: 'ff-mqtt-conf' }
         },
         color: '#d8bfd8',
         inputs: 0,
@@ -519,6 +536,10 @@ The copyright notice for this fork is the same as the original.
                 $('div.form-row.form-row-mqtt-static').toggleClass('form-row-mqtt-static-disabled', !!dynamic)
             }
 
+            $('#node-input-lwt-placeholder').on('click', function () {
+                RED.editor.editConfig('', 'ff-mqtt-conf',this.lwt)
+            })
+
             // $('#node-input-broker').on('change', function (d) {
             //     updateVisibility()
             // })
@@ -547,6 +568,31 @@ The copyright notice for this fork is the same as the original.
             if ($('#node-input-topicType').val() === 'dynamic') {
                 $('#node-input-topic').val('')
             }
+        },
+        onadd: function () {
+            let found = undefined
+            RED.nodes.eachConfig(function(n) {
+                if (n.type === 'ff-mqtt-conf') {
+                    found = n.id
+                }
+            })
+            if (found) {
+                this.lwt = found
+            } else {
+                const base = RED.nodes.getType('ff-mqtt-conf')
+                const LWTnode = {
+                    _def: base,
+                    id: RED.nodes.id(),
+                    type: 'ff-mqtt-conf',
+                    ...mapDefaults(base.defaults),
+                    users: []
+                }
+                LWTnode.dirty = true
+                LWTnode.changed = true
+                RED.nodes.add(LWTnode)
+                RED.editor.validateNode(LWTnode)
+                this.lwt = LWTnode.id
+            }
         }
     })
 
@@ -561,7 +607,8 @@ The copyright notice for this fork is the same as the original.
             contentType: { value: '' },
             userProps: { value: '' },
             correl: { value: '' },
-            expiry: { value: '' }
+            expiry: { value: '' },
+            lwt: { type: 'ff-mqtt-conf' }
         },
         color: '#d8bfd8',
         inputs: 1,
@@ -600,6 +647,10 @@ The copyright notice for this fork is the same as the original.
                     $('div.form-row.mqtt5').hide()
                 }
             }
+
+            $('#node-input-lwt-placeholder').on('click', function () {
+                RED.editor.editConfig('', 'ff-mqtt-conf',this.lwt)
+            })
 
             // $('#node-input-broker').on('change', function (d) {
             showHideDynamicFields()
@@ -643,6 +694,31 @@ The copyright notice for this fork is the same as the original.
         },
         labelStyle: function () {
             return this.name ? 'node_label_italic' : ''
+        },
+        onadd: function () {
+            let found = undefined
+            RED.nodes.eachConfig(function(n) {
+                if (n.type === 'ff-mqtt-conf') {
+                    found = n.id
+                }
+            })
+            if (found) {
+                this.lwt = found
+            } else {
+                const base = RED.nodes.getType('ff-mqtt-conf')
+                const LWTnode = {
+                    _def: base,
+                    id: RED.nodes.id(),
+                    type: 'ff-mqtt-conf',
+                    ...mapDefaults(base.defaults),
+                    users: []
+                }
+                LWTnode.dirty = true
+                LWTnode.changed = true
+                RED.nodes.add(LWTnode)
+                RED.editor.validateNode(LWTnode)
+                this.lwt = LWTnode.id
+            }
         }
     })
 
