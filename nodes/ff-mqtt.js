@@ -681,6 +681,21 @@ module.exports = function (RED) {
                 settings.keepalive = mqttSettings.keepalive || 60
                 settings.cleansession = mqttSettings.cleansession !== false // default to true
                 settings.topicAliasMaximum = mqttSettings.topicAliasMaximum || 0
+                settings.birthTopic = n.birthTopic
+                settings.birthPayload = n.birthPayload
+                settings.birthRetain = n.birthRetain
+                settings.birthQos = n.birthQos
+                settings.birthMsg = n.birthMsg
+                settings.closeTopic = n.closeTopic
+                settings.closePayload = n.closePayload
+                settings.closeRetain = n.closeRetain
+                settings.closeQos = n.closeQos
+                settings.closeMsg = n.closeMsg
+                settings.willTopic = n.willTopic
+                settings.willPayload = n.willPayload
+                settings.willRetain = n.willRetain
+                settings.willQos = n.willQos
+                settings.willMsg = n.willMsg
                 node.setOptions(settings, true) // initial options
                 node._initialised = true
             } catch (error) {
