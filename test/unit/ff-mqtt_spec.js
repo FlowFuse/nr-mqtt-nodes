@@ -105,7 +105,8 @@ describe('FF MQTT Nodes', function () {
 
     it('should be loaded and have default values', async function () {
         this.timeout = 2000
-        const { flow } = buildBasicMQTTSendRecvFlow({ id: 'mqtt.in', topic: 'in_topic' }, { id: 'mqtt.out', topic: 'out_topic' })
+        const { flow } = buildBasicMQTTSendRecvFlow({ id: 'mqtt.in', topic: 'in_topic', lwt: 'broker.node' }, { id: 'mqtt.out', topic: 'out_topic', lwt: 'broker.node' })
+        console.log(flow)
         await helper.load(mqttNodes, flow)
 
         const mqttIn = helper.getNode('mqtt.in')
@@ -125,13 +126,13 @@ describe('FF MQTT Nodes', function () {
         mqttOut.should.have.property('brokerConn').and.be.type('object')
 
         mqttOut.brokerConn.should.equal(mqttIn.brokerConn) // should be the same broker connection
-        const mqttBroker = mqttOut.brokerConn
-        clearInterval(mqttBroker.linkMonitorInterval) // clear the link monitor interval so the test can exit
+        // const mqttBroker = mqttOut.brokerConn
+        // clearInterval(mqttBroker.linkMonitorInterval) // clear the link monitor interval so the test can exit
     })
 
     it('should publish with QoS 1 and retain false by default', async function () {
         this.timeout = 2000
-        const { flow } = buildBasicMQTTSendRecvFlow({ id: 'mqtt.in', topic: 'in_topic' }, { id: 'mqtt.out', topic: 'out_topic' })
+        const { flow } = buildBasicMQTTSendRecvFlow({ id: 'mqtt.in', topic: 'in_topic', lwt: 'broker.node' }, { id: 'mqtt.out', topic: 'out_topic', lwt: 'broker.node' })
         await helper.load(mqttNodes, flow)
 
         const mqttOut = helper.getNode('mqtt.out')
@@ -161,7 +162,7 @@ describe('FF MQTT Nodes', function () {
 
     it('should publish with specified QoS and retain values', async function () {
         this.timeout = 2000
-        const { flow } = buildBasicMQTTSendRecvFlow({ id: 'mqtt.in', topic: 'in_topic' }, { id: 'mqtt.out', topic: '' })
+        const { flow } = buildBasicMQTTSendRecvFlow({ id: 'mqtt.in', topic: 'in_topic', lwt: 'broker.node' }, { id: 'mqtt.out', topic: '', lwt: 'broker.node' })
         await helper.load(mqttNodes, flow)
 
         const mqttOut = helper.getNode('mqtt.out')
@@ -824,6 +825,7 @@ function testSendRecv (brokerOptions, inNodeOptions, outNodeOptions, options, ho
 function buildBasicMQTTSendRecvFlow (inOptions, outOptions) {
     const inNode = buildMQTTInNode(inOptions.id, inOptions.name, inOptions.topic, inOptions, ['helper.node'])
     const outNode = buildMQTTOutNode(outOptions.id, outOptions.name, outOptions.topic, outOptions)
+    const brokerNode = buildMQTTBrokerNode('broker', 'mqtt.broker', 'localhost', 1880, {})
     const helper = buildNode('helper', 'helper.node', 'helper_node', {})
     const catchNode = buildNode('catch', 'catch.node', 'catch_node', { scope: ['mqtt.in'] }, ['helper.node'])
     return {
@@ -831,9 +833,10 @@ function buildBasicMQTTSendRecvFlow (inOptions, outOptions) {
             [inNode.name]: inNode,
             [outNode.name]: outNode,
             [helper.name]: helper,
-            [catchNode.name]: catchNode
+            [catchNode.name]: catchNode,
+            [brokerNode.name]: brokerNode
         },
-        flow: [inNode, outNode, helper, catchNode]
+        flow: [brokerNode, inNode, outNode, helper, catchNode]
     }
 }
 
@@ -841,7 +844,7 @@ function buildMQTTBrokerNode (id, name, brokerHost, brokerPort, options) {
     // url,broker,port,clientid,autoConnect,usetls,usews,verifyservercert,compatmode,protocolVersion,keepalive,
     // cleansession,sessionExpiry,topicAliasMaximum,maximumPacketSize,receiveMaximum,userProperties,userPropertiesType,autoUnsubscribe
     options = options || {}
-    const node = buildNode('mqtt-broker', id || 'mqtt.broker', name || 'mqtt_broker', options)
+    const node = buildNode('ff-mqtt-conf', id || 'mqtt.broker', name || 'mqtt_broker', options)
     node.url = options.url
     node.broker = brokerHost || options.broker || BROKER_HOST
     node.port = brokerPort || options.port || BROKER_PORT
