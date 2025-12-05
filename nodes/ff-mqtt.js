@@ -61,33 +61,33 @@ module.exports = function (RED) {
     })
 
     /** @type {MQTTBrokerNode} */
-    const sharedBroker = new MQTTBrokerNode(mqttSettings)
+    // const sharedBroker = new MQTTBrokerNode(mqttSettings)
 
-    /* Monitor link status and attept to relink if node has users but is unlinked */
-    let linkTryCount = 0
-    const MAX_LINK_ATTEMPTS = 5
-    sharedBroker.linkMonitorInterval = setInterval(async function () {
-        if (Object.keys(sharedBroker.users).length < 1) {
-            return // no users registered (yet)
-        }
-        if (sharedBroker.linked && !sharedBroker.linkFailed) {
-            clearInterval(sharedBroker.linkMonitorInterval)
-            sharedBroker.linkMonitorInterval = null
-        }
-        if (sharedBroker.linkFailed) {
-            try {
-                linkTryCount++
-                await sharedBroker.link()
-                linkTryCount = 0
-            } catch (_err) {
-                if (linkTryCount >= MAX_LINK_ATTEMPTS) {
-                    clearInterval(sharedBroker.linkMonitorInterval)
-                    sharedBroker.linkMonitorInterval = null
-                    sharedBroker.warn('Maximum Failed Link Attempts. Restart or redeploy to re-establish the connection.')
-                }
-            }
-        }
-    }, (Math.floor(Math.random() * 10000) + 55000)) // 55-65 seconds
+    // /* Monitor link status and attempt to relink if node has users but is unlinked */
+    // let linkTryCount = 0
+    // const MAX_LINK_ATTEMPTS = 5
+    // sharedBroker.linkMonitorInterval = setInterval(async function () {
+    //     if (Object.keys(sharedBroker.users).length < 1) {
+    //         return // no users registered (yet)
+    //     }
+    //     if (sharedBroker.linked && !sharedBroker.linkFailed) {
+    //         clearInterval(sharedBroker.linkMonitorInterval)
+    //         sharedBroker.linkMonitorInterval = null
+    //     }
+    //     if (sharedBroker.linkFailed) {
+    //         try {
+    //             linkTryCount++
+    //             await sharedBroker.link()
+    //             linkTryCount = 0
+    //         } catch (_err) {
+    //             if (linkTryCount >= MAX_LINK_ATTEMPTS) {
+    //                 clearInterval(sharedBroker.linkMonitorInterval)
+    //                 sharedBroker.linkMonitorInterval = null
+    //                 sharedBroker.warn('Maximum Failed Link Attempts. Restart or redeploy to re-establish the connection.')
+    //             }
+    //         }
+    //     }
+    // }, (Math.floor(Math.random() * 10000) + 55000)) // 55-65 seconds
 
     const mqtt = require('mqtt')
     const isUtf8 = require('is-utf8')
@@ -450,9 +450,9 @@ module.exports = function (RED) {
 
     function updateStatus (node, allNodes) {
         let setStatus = setStatusDisconnected
-        if (sharedBroker?.connecting) {
+        if (node?.connecting) {
             setStatus = setStatusConnecting
-        } else if (sharedBroker?.connected) {
+        } else if (node?.connected) {
             setStatus = setStatusConnected
         }
         setStatus(node, allNodes)
@@ -574,6 +574,7 @@ module.exports = function (RED) {
     // #region  "Broker node"
     function MQTTBrokerNode (n) {
         /** @type {MQTTBrokerNode} */
+        RED.nodes.createNode(this, n)
         const node = this
         node._initialised = false
         node._initialising = false
@@ -1528,6 +1529,8 @@ module.exports = function (RED) {
         }
     }
 
+    RED.nodes.registerType('ff-mqtt-conf', MQTTBrokerNode, {})
+
     // #endregion  "Broker node"
 
     // #region MQTTIn node
@@ -1535,7 +1538,7 @@ module.exports = function (RED) {
         RED.nodes.createNode(this, n)
         /** @type {MQTTInNode} */const node = this
 
-        /** @type {MQTTBrokerNode} */node.brokerConn = sharedBroker // RED.nodes.getNode(node.broker)
+        /** @type {MQTTBrokerNode} */node.brokerConn = RED.nodes.getNode(n.lwt) // RED.nodes.getNode(node.broker)
 
         node.dynamicSubs = {}
         node.isDynamic = hasProperty(n, 'inputs') && +n.inputs === 1
@@ -1764,7 +1767,7 @@ module.exports = function (RED) {
         // node.payloadFormatIndicator = n.payloadFormatIndicator; //https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901111
         // node.subscriptionIdentifier = n.subscriptionIdentifier;//https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901117
 
-        /** @type {MQTTBrokerNode} */node.brokerConn = sharedBroker // RED.nodes.getNode(node.broker)
+        /** @type {MQTTBrokerNode} */node.brokerConn = RED.nodes.getNode(n.lwt) // RED.nodes.getNode(node.broker)
 
         const Actions = {
             CONNECT: 'connect',
@@ -1794,7 +1797,7 @@ module.exports = function (RED) {
                                 node.__lastErrorMessage = text
                             }
                         } else if (node.__lastErrorMessage) {
-                            updateStatus(node, false)
+                            node.brokerConn.updateStatus(node, false)
                             node.__lastErrorMessage = null
                         }
                         done(err)
@@ -1851,11 +1854,4 @@ module.exports = function (RED) {
         }
     })
     // #endregion "MQTTOut node"
-
-    function MQTTLWTNode (n) {
-        RED.nodes.createNode(this, n)
-        // const node = this
-    }
-
-    RED.nodes.registerType('ff-mqtt-conf', MQTTLWTNode, {})
 }
