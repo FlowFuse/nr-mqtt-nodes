@@ -613,7 +613,7 @@ module.exports = function (RED) {
         /** @type {mqtt.MqttClient} */
         node.client = null
         node.linkPromise = null
-        node._linked = mqttSettings.linked || false
+        node._linked = true // mqttSettings.linked || false
         node._linkFailed = false
 
         node.link = async function () {
