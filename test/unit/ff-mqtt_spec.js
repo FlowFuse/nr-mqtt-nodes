@@ -106,7 +106,6 @@ describe('FF MQTT Nodes', function () {
     it('should be loaded and have default values', async function () {
         this.timeout = 2000
         const { flow } = buildBasicMQTTSendRecvFlow({ id: 'mqtt.in', topic: 'in_topic', lwt: 'broker.node' }, { id: 'mqtt.out', topic: 'out_topic', lwt: 'broker.node' })
-        console.log(flow)
         await helper.load(mqttNodes, flow)
 
         const mqttIn = helper.getNode('mqtt.in')
