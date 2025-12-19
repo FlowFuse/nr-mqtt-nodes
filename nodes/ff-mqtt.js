@@ -60,34 +60,9 @@ module.exports = function (RED) {
         agent: ProxyHelper.getHTTPProxyAgent(forgeSettings.forgeURL, { timeout: 4000 })
     })
 
-    /** @type {MQTTBrokerNode} */
-    // const sharedBroker = new MQTTBrokerNode(mqttSettings)
-
     // /* Monitor link status and attempt to relink if node has users but is unlinked */
-    // let linkTryCount = 0
-    // const MAX_LINK_ATTEMPTS = 5
-    // sharedBroker.linkMonitorInterval = setInterval(async function () {
-    //     if (Object.keys(sharedBroker.users).length < 1) {
-    //         return // no users registered (yet)
-    //     }
-    //     if (sharedBroker.linked && !sharedBroker.linkFailed) {
-    //         clearInterval(sharedBroker.linkMonitorInterval)
-    //         sharedBroker.linkMonitorInterval = null
-    //     }
-    //     if (sharedBroker.linkFailed) {
-    //         try {
-    //             linkTryCount++
-    //             await sharedBroker.link()
-    //             linkTryCount = 0
-    //         } catch (_err) {
-    //             if (linkTryCount >= MAX_LINK_ATTEMPTS) {
-    //                 clearInterval(sharedBroker.linkMonitorInterval)
-    //                 sharedBroker.linkMonitorInterval = null
-    //                 sharedBroker.warn('Maximum Failed Link Attempts. Restart or redeploy to re-establish the connection.')
-    //             }
-    //         }
-    //     }
-    // }, (Math.floor(Math.random() * 10000) + 55000)) // 55-65 seconds
+    let linkTryCount = 0
+    const MAX_LINK_ATTEMPTS = 5
 
     const mqtt = require('mqtt')
     const isUtf8 = require('is-utf8')
@@ -613,8 +588,31 @@ module.exports = function (RED) {
         /** @type {mqtt.MqttClient} */
         node.client = null
         node.linkPromise = null
-        node._linked = true // mqttSettings.linked || false
+        node._linked = mqttSettings.linked || false
         node._linkFailed = false
+
+        node.linkMonitorInterval = setInterval(async function () {
+            if (Object.keys(node.users).length < 1) {
+                return // no users registered (yet)
+            }
+            if (node.linked && !node.linkFailed) {
+                clearInterval(node.linkMonitorInterval)
+                node.linkMonitorInterval = null
+            }
+            if (node.linkFailed) {
+                try {
+                    linkTryCount++
+                    await node.link()
+                    linkTryCount = 0
+                } catch (_err) {
+                    if (linkTryCount >= MAX_LINK_ATTEMPTS) {
+                        clearInterval(node.linkMonitorInterval)
+                        node.linkMonitorInterval = null
+                        node.warn('Maximum Failed Link Attempts. Restart or redeploy to re-establish the connection.')
+                    }
+                }
+            }
+        }, (Math.floor(Math.random() * 10000) + 55000)) // 55-65 seconds
 
         node.link = async function () {
             if (node.linkPromise) {
