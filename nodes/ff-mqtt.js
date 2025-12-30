@@ -1092,7 +1092,7 @@ module.exports = function (RED) {
                     })
                 } catch (err) {
                     // eslint-disable-next-line no-console
-                    console.err(err)
+                    console.error(err)
                 }
             }
         }
