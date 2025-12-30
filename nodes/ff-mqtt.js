@@ -10,7 +10,6 @@ The copyright notice for this fork is the same as the original.
 - Remove the dynamic connection control
 - lint errors fixed up
 */
-/* eslint-disable brace-style */
 const ProxyHelper = require('./lib/proxyHelper.js')
 const { createNrMqttId, createNrMqttClientId } = require('./lib/util.js')
 const TeamBrokerApi = require('./lib/TeamBrokerApi.js')
@@ -337,36 +336,36 @@ module.exports = function (RED) {
             if (v5isUtf8 || v5HasMediaType) {
                 const outputType = knownMediaTypes[v5MediaTypeLC]
                 switch (outputType) {
-                case 'string':
-                    payload = payload.toString()
-                    break
-                case 'buffer':
-                    // no change
-                    break
-                case 'json':
-                    try {
-                        // since v5 type states this should be JSON, parse it & error out if NOT JSON
+                    case 'string':
                         payload = payload.toString()
-                        const obj = JSON.parse(payload)
-                        if (datatype === 'auto-detect') {
-                            payload = obj // as mode is "auto-detect", return the parsed JSON
+                        break
+                    case 'buffer':
+                        // no change
+                        break
+                    case 'json':
+                        try {
+                            // since v5 type states this should be JSON, parse it & error out if NOT JSON
+                            payload = payload.toString()
+                            const obj = JSON.parse(payload)
+                            if (datatype === 'auto-detect') {
+                                payload = obj // as mode is "auto-detect", return the parsed JSON
+                            }
+                        } catch (e) {
+                            node.error(RED._('ff-mqtt.errors.invalid-json-parse'), { payload, topic, qos: packet.qos, retain: packet.retain }); return
                         }
-                    } catch (e) {
-                        node.error(RED._('ff-mqtt.errors.invalid-json-parse'), { payload, topic, qos: packet.qos, retain: packet.retain }); return
-                    }
-                    break
-                default:
-                    if (v5isUtf8 || isUtf8(payload)) {
-                        payload = payload.toString() // auto String
-                        if (datatype === 'auto-detect') {
-                            try {
-                                payload = JSON.parse(payload) // auto to parsed object (attempt)
-                            } catch (e) {
-                                /* mute error - it simply isnt JSON, just leave payload as a string */
+                        break
+                    default:
+                        if (v5isUtf8 || isUtf8(payload)) {
+                            payload = payload.toString() // auto String
+                            if (datatype === 'auto-detect') {
+                                try {
+                                    payload = JSON.parse(payload) // auto to parsed object (attempt)
+                                } catch (e) {
+                                    /* mute error - it simply isnt JSON, just leave payload as a string */
+                                }
                             }
                         }
-                    }
-                    break
+                        break
                 }
             } else if (isUtf8(payload)) {
                 payload = payload.toString() // auto String
@@ -1093,7 +1092,7 @@ module.exports = function (RED) {
                     })
                 } catch (err) {
                     // eslint-disable-next-line no-console
-                    console.log(err)
+                    console.err(err)
                 }
             }
         }
@@ -1228,18 +1227,14 @@ module.exports = function (RED) {
                 options = subscription.options
                 ref = subscription.ref
                 callback = subscription.callback
-            }
-
-            // function signature 2: subscribe(topic: String, options: Object, callback: Function, ref: String)
-            else if (typeof topic === 'string') {
+            } else if (typeof topic === 'string') {
+                // function signature 2: subscribe(topic: String, options: Object, callback: Function, ref: String)
                 // since this is a call where all params are provided, it might be
                 // a node change (modification) so we need to check for changes
                 doCompare = true
                 subscription = node.subscriptions[topic] && node.subscriptions[topic][ref]
-            }
-
-            // bad function call
-            else {
+            } else {
+                // bad function call
                 console.warn('Invalid call to node.subscribe')
                 return
             }
