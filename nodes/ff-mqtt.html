@@ -714,35 +714,13 @@ The copyright notice for this fork is the same as the original.
         }
     }
 
-    function singletonLWTConfig (node) {
-        if (node.type === 'ff-mqtt-conf') {
-            const ffConf = []
-            RED.nodes.eachConfig((n) => {
-                if (n.type === 'ff-mqtt-conf') {
-                    ffConf.push(n)
-                }
-            })
-            // Remove all but first
-            while (ffConf.length > 1) {
-                const n = ffConf.pop()
-                RED.nodes.remove(n.id)
-                RED.nodes.dirty(true)
-            }
-            if (ffConf.length > 0) {
-                const lwt = ffConf[0].id
-                RED.nodes.eachNode((n) => {
-                    if (n.type === 'ff-mqtt-in' || n.type === 'ff-mqtt-out') {
-                        if (n.lwt !== lwt) {
-                            n.lwt = lwt
-                        }
-                    }
-                })
-            }
-        }
-    }
+    // Create a single debounced instance
+    const debouncedSingletonLWTConfig = debounce(singletonLWTConfig, 25)
 
     RED.events.on('nodes:add', function (node) {
-        debounce(singletonLWTConfig, 25)
+        if (node && node.type && node.type.startsWith('ff-mqtt')) {
+            debouncedSingletonLWTConfig(node)
+        }
     })
 })()
 </script>
