@@ -714,6 +714,107 @@ The copyright notice for this fork is the same as the original.
         }
     }
 
+    function singletonLWTConfig () {
+        let historyModified = false
+        const historyEvents = {
+            t: 'multi',
+            events: [],
+            dirty: RED.nodes.dirty()
+        }
+
+        // first find any existing ff-mqtt-in or ff-mqtt-out nodes and note their LWT config
+        const ffMqttNodes = []
+        RED.nodes.eachNode((n) => {
+            if (n.type === 'ff-mqtt-in' || n.type === 'ff-mqtt-out') {
+                ffMqttNodes.push(n)
+            }
+        })
+
+        // Now gather all ff-mqtt-conf nodes
+        const ffConf = []
+        RED.nodes.eachConfig((n) => {
+            if (n.type === 'ff-mqtt-conf') {
+                ffConf.push(n)
+            }
+        })
+
+        let firstLwtNode
+        if (ffConf.length > 0) {
+            firstLwtNode = ffConf[0]
+            ffConf.splice(0, 1)
+        }
+
+        // Remove all other ff-mqtt-conf nodes
+        while (ffConf.length > 0) {
+            const n = ffConf.pop()
+            RED.nodes.remove(n.id)
+            RED.nodes.dirty(true)
+        }
+
+        // if there is no LWT node, create one
+        if (!firstLwtNode) {
+            const lwtConf = RED.nodes.getType('ff-mqtt-conf')
+            firstLwtNode = {
+                _def: lwtConf,
+                id: RED.nodes.id(),
+                type: 'ff-mqtt-conf',
+                ...mapDefaults(lwtConf.defaults),
+                users: []
+            }
+            firstLwtNode.dirty = true
+            firstLwtNode.changed = true
+            RED.nodes.add(firstLwtNode) // pass in an option we can inspect later in the event handler
+            RED.editor.validateNode(firstLwtNode)
+
+            // now, peek RED.history to see if the last action was adding an ff-mqtt-in or ff-mqtt-out node,
+            // update that history entry to also include addition of this LWT node, so undo works as expected
+            const lastHistoryEntry = RED.history.peek()
+            if (lastHistoryEntry && lastHistoryEntry.t === 'add' && lastHistoryEntry.nodes?.length > 0) {
+                const lastNode = RED.nodes.node(lastHistoryEntry.nodes[0])
+                if (lastNode && (lastNode.type === 'ff-mqtt-in' || lastNode.type === 'ff-mqtt-out')) {
+                    lastHistoryEntry.nodes.push(firstLwtNode.id)
+                    historyEvents.events = [lastHistoryEntry]
+                    historyEvents.dirty = lastHistoryEntry.dirty
+                    historyModified = true
+                }
+            }
+
+            // if history wasnt updated, we need to add a new history event for this new LWT node to support undo
+            if (!historyModified) {
+                historyEvents.events.push({
+                    t: 'add',
+                    nodes: [firstLwtNode.id],
+                    dirty: RED.nodes.dirty()
+                })
+            }
+        }
+
+        // Update all in/out nodes to use the singleton LWT
+        if (firstLwtNode) {
+            const lwtNodeId = firstLwtNode.id
+            for (const n of ffMqttNodes) {
+                if (n.lwt !== lwtNodeId) {
+                    n.lwt = lwtNodeId
+                    n.dirty = true
+                    n.changed = true
+                    RED.editor.validateNode(n)
+                    RED.nodes.updateConfigNodeUsers(n, { action: 'add' }) // update the users list on the LWT node
+                    RED.sidebar.config.refresh() // in case the config panel is open
+                    RED.nodes.dirty(true)
+                }
+            }
+        }
+
+        // commit the history event (if we made any changes)
+        if (historyEvents.events.length > 0) {
+            if (historyModified) {
+                RED.history.replace(historyEvents)
+            } else {
+                RED.history.push(historyEvents)
+            }
+        }
+    }
+
     // Create a single debounced instance
     const debouncedSingletonLWTConfig = debounce(singletonLWTConfig, 25)
 
