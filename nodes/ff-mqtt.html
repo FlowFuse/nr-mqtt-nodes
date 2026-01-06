@@ -747,6 +747,52 @@ The copyright notice for this fork is the same as the original.
             return 'Team Broker LWT'
         }
     })
+
+    function debounce (func, wait, immediate) {
+        let timeout
+        return function () {
+            const context = this; const args = arguments
+            const later = function () {
+                timeout = null
+                if (!immediate) func.apply(context, args)
+            }
+            const callNow = immediate && !timeout
+            clearTimeout(timeout)
+            timeout = setTimeout(later, wait)
+            if (callNow) func.apply(context, args)
+        }
+    }
+
+    function singletonLWTConfig (node) {
+        if (node.type === 'ff-mqtt-conf') {
+            const ffConf = []
+            RED.nodes.eachConfig((n) => {
+                if (n.type === 'ff-mqtt-conf') {
+                    ffConf.push(n)
+                }
+            })
+            // Remove all but first
+            while (ffConf.length > 1) {
+                const n = ffConf.pop()
+                RED.nodes.remove(n.id)
+                RED.nodes.dirty(true)
+            }
+            if (ffConf.length > 0) {
+                const lwt = ffConf[0].id
+                RED.nodes.eachNode((n) => {
+                    if (n.type === 'ff-mqtt-in' || n.type === 'ff-mqtt-out') {
+                        if (n.lwt !== lwt) {
+                            n.lwt = lwt
+                        }
+                    }
+                })
+            }
+        }
+    }
+
+    RED.events.on('nodes:add', function (node) {
+        debounce(singletonLWTConfig, 25)
+    })
 })()
 </script>
 
