@@ -59,34 +59,9 @@ module.exports = function (RED) {
         agent: ProxyHelper.getHTTPProxyAgent(forgeSettings.forgeURL, { timeout: 4000 })
     })
 
-    /** @type {MQTTBrokerNode} */
-    const sharedBroker = new MQTTBrokerNode(mqttSettings)
-
-    /* Monitor link status and attept to relink if node has users but is unlinked */
+    // /* Monitor link status and attempt to relink if node has users but is unlinked */
     let linkTryCount = 0
     const MAX_LINK_ATTEMPTS = 5
-    sharedBroker.linkMonitorInterval = setInterval(async function () {
-        if (Object.keys(sharedBroker.users).length < 1) {
-            return // no users registered (yet)
-        }
-        if (sharedBroker.linked && !sharedBroker.linkFailed) {
-            clearInterval(sharedBroker.linkMonitorInterval)
-            sharedBroker.linkMonitorInterval = null
-        }
-        if (sharedBroker.linkFailed) {
-            try {
-                linkTryCount++
-                await sharedBroker.link()
-                linkTryCount = 0
-            } catch (_err) {
-                if (linkTryCount >= MAX_LINK_ATTEMPTS) {
-                    clearInterval(sharedBroker.linkMonitorInterval)
-                    sharedBroker.linkMonitorInterval = null
-                    sharedBroker.warn('Maximum Failed Link Attempts. Restart or redeploy to re-establish the connection.')
-                }
-            }
-        }
-    }, (Math.floor(Math.random() * 10000) + 55000)) // 55-65 seconds
 
     const mqtt = require('mqtt')
     const isUtf8 = require('is-utf8')
@@ -449,9 +424,9 @@ module.exports = function (RED) {
 
     function updateStatus (node, allNodes) {
         let setStatus = setStatusDisconnected
-        if (sharedBroker?.connecting) {
+        if (node?.connecting) {
             setStatus = setStatusConnecting
-        } else if (sharedBroker?.connected) {
+        } else if (node?.connected) {
             setStatus = setStatusConnected
         }
         setStatus(node, allNodes)
@@ -573,6 +548,7 @@ module.exports = function (RED) {
     // #region  "Broker node"
     function MQTTBrokerNode (n) {
         /** @type {MQTTBrokerNode} */
+        RED.nodes.createNode(this, n)
         const node = this
         node._initialised = false
         node._initialising = false
@@ -613,6 +589,29 @@ module.exports = function (RED) {
         node.linkPromise = null
         node._linked = mqttSettings.linked || false
         node._linkFailed = false
+
+        node.linkMonitorInterval = setInterval(async function () {
+            if (Object.keys(node.users).length < 1) {
+                return // no users registered (yet)
+            }
+            if (node.linked && !node.linkFailed) {
+                clearInterval(node.linkMonitorInterval)
+                node.linkMonitorInterval = null
+            }
+            if (node.linkFailed) {
+                try {
+                    linkTryCount++
+                    await node.link()
+                    linkTryCount = 0
+                } catch (_err) {
+                    if (linkTryCount >= MAX_LINK_ATTEMPTS) {
+                        clearInterval(node.linkMonitorInterval)
+                        node.linkMonitorInterval = null
+                        node.warn('Maximum Failed Link Attempts. Restart or redeploy to re-establish the connection.')
+                    }
+                }
+            }
+        }, (Math.floor(Math.random() * 10000) + 55000)) // 55-65 seconds
 
         node.link = async function () {
             if (node.linkPromise) {
@@ -679,6 +678,21 @@ module.exports = function (RED) {
                 settings.keepalive = mqttSettings.keepalive || 60
                 settings.cleansession = mqttSettings.cleansession !== false // default to true
                 settings.topicAliasMaximum = mqttSettings.topicAliasMaximum || 0
+                settings.birthTopic = n.birthTopic
+                settings.birthPayload = n.birthPayload
+                settings.birthRetain = n.birthRetain
+                settings.birthQos = n.birthQos
+                settings.birthMsg = n.birthMsg
+                settings.closeTopic = n.closeTopic
+                settings.closePayload = n.closePayload
+                settings.closeRetain = n.closeRetain
+                settings.closeQos = n.closeQos
+                settings.closeMsg = n.closeMsg
+                settings.willTopic = n.willTopic
+                settings.willPayload = n.willPayload
+                settings.willRetain = n.willRetain
+                settings.willQos = n.willQos
+                settings.willMsg = n.willMsg
                 node.setOptions(settings, true) // initial options
                 node._initialised = true
             } catch (error) {
@@ -1091,7 +1105,6 @@ module.exports = function (RED) {
                     node._clientOn('error', function (error) {
                     })
                 } catch (err) {
-                    // eslint-disable-next-line no-console
                     console.error(err)
                 }
             }
@@ -1447,12 +1460,11 @@ module.exports = function (RED) {
             }
         }
 
-        // no `on` or `close` handlers for the static broker node
-        // node.on('close', function (done) {
-        //     node.disconnect(function () {
-        //         done()
-        //     })
-        // })
+        node.on('close', function (done) {
+            node.disconnect(function () {
+                done()
+            })
+        })
 
         // fake the node.status function if it is not already defined
         if (typeof node.status !== 'function') {
@@ -1523,6 +1535,8 @@ module.exports = function (RED) {
         }
     }
 
+    RED.nodes.registerType('ff-mqtt-conf', MQTTBrokerNode, {})
+
     // #endregion  "Broker node"
 
     // #region MQTTIn node
@@ -1530,7 +1544,7 @@ module.exports = function (RED) {
         RED.nodes.createNode(this, n)
         /** @type {MQTTInNode} */const node = this
 
-        /** @type {MQTTBrokerNode} */node.brokerConn = sharedBroker // RED.nodes.getNode(node.broker)
+        /** @type {MQTTBrokerNode} */node.brokerConn = RED.nodes.getNode(n.lwt) // RED.nodes.getNode(node.broker)
 
         node.dynamicSubs = {}
         node.isDynamic = hasProperty(n, 'inputs') && +n.inputs === 1
@@ -1759,7 +1773,7 @@ module.exports = function (RED) {
         // node.payloadFormatIndicator = n.payloadFormatIndicator; //https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901111
         // node.subscriptionIdentifier = n.subscriptionIdentifier;//https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901117
 
-        /** @type {MQTTBrokerNode} */node.brokerConn = sharedBroker // RED.nodes.getNode(node.broker)
+        /** @type {MQTTBrokerNode} */node.brokerConn = RED.nodes.getNode(n.lwt) // RED.nodes.getNode(node.broker)
 
         const Actions = {
             CONNECT: 'connect',

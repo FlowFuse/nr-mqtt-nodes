@@ -159,6 +159,10 @@ The copyright notice for this fork is the same as the original.
         </select>
     </div>
     <div class="form-row">
+        <label><i class="fa fa-cog"></i> Config</label>
+        <button id="node-input-lwt-placeholder" class="red-ui-button">LWT/Birth/Death Messages</button>
+    </div>
+    <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
         <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name">
     </div>
@@ -221,18 +225,189 @@ The copyright notice for this fork is the same as the original.
     </div>
 
     <div class="form-row">
+        <label><i class="fa fa-cog"></i> Config</label>
+        <button id="node-input-lwt-placeholder" class="red-ui-button">LWT/Birth/Death Messages</button>
+    </div>
+
+    <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
         <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name">
     </div>
     <div class="form-tips"><span data-i18n="ff-mqtt.tip"></span></div>
 </script>
 
+<script type="text/html" data-template-name="ff-mqtt-conf">
+    <div class="red-ui-palette-header">
+        <i class="fa fa-angle-down"></i><span data-i18n="ff-mqtt.sections-label.birth-message"></span>
+    </div>
+    <div class="section-content" style="padding:10px 0 0 10px">
+        <div class="form-row">
+            <label style="width: 100px !important;" for="node-config-input-birthTopic"><i class="fa fa-tasks"></i> <span
+                    data-i18n="common.label.topic"></span></label>
+            <input style="width: calc(100% - 300px) !important" type="text" id="node-config-input-birthTopic"
+                data-i18n="[placeholder]ff-mqtt.placeholder.birth-topic">
+            <label style="margin-left: 10px; width: 90px !important;" for="node-config-input-birthRetain"><i
+                    class="fa fa-history"></i> <span data-i18n="ff-mqtt.label.retain"></span></label>
+            <select id="node-config-input-birthRetain" style="width:75px !important">
+                <option value="false" data-i18n="ff-mqtt.false"></option>
+                <option value="true" data-i18n="ff-mqtt.true"></option>
+            </select>
+        </div>
+        <div class="form-row">
+            <label style="width: 100px !important;" for="node-config-input-birthPayload"><i class="fa fa-envelope"></i>
+                <span data-i18n="common.label.payload"></span></label>
+            <input style="width: calc(100% - 300px) !important" type="text" id="node-config-input-birthPayload"
+                style="width:300px" data-i18n="[placeholder]common.label.payload">
+            <label style="margin-left: 10px; width: 90px !important;" for="node-config-input-birthQos"><i
+                    class="fa fa-empire"></i> <span data-i18n="ff-mqtt.label.qos"></span></label>
+            <select id="node-config-input-birthQos" style="width:75px !important">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+            </select>
+        </div>
+        <div class="form-row mqtt5 mqtt5-out">
+            <label for="node-config-input-birth-contentType" data-i18n="ff-mqtt.label.contentType"></label>
+            <input type="text" style="width:calc(100% - 200px);" id="node-config-input-birth-contentType">
+        </div>
+        <div class="form-row mqtt5 mqtt5-out">
+            <label for="node-config-input-birth-props" data-i18n="ff-mqtt.label.userProperties"></label>
+            <input type="text" style="width:calc(100% - 200px);" id="node-config-input-birth-props">
+        </div>
+        <div class="form-row mqtt5 mqtt5-out">
+            <label for="node-config-input-birth-respTopic"><span data-i18n="ff-mqtt.label.responseTopic"></span></label>
+            <input type="text" id="node-config-input-birth-respTopic" style="width: calc(100% - 200px);">
+        </div>
+        <div class="form-row mqtt5 mqtt5-out">
+            <label for="node-config-input-birth-correl"><span data-i18n="ff-mqtt.label.correlationData"></span></label>
+            <input type="text" id="node-config-input-birth-correl" style="width: calc(100% - 200px);">
+        </div>
+        <div class="form-row mqtt5 mqtt5-out">
+            <label for="node-config-input-birth-expiry"><span data-i18n="ff-mqtt.label.expiry"></span></label>
+            <input id="node-config-input-birth-expiry" style="width: calc(100% - 200px);">
+        </div>
+    </div>
+    </div>
+    <div id="mqtt-broker-section-close">
+        <div class="red-ui-palette-header">
+            <i class="fa fa-angle-down"></i><span data-i18n="ff-mqtt.sections-label.close-message"></span>
+        </div>
+        <div class="section-content" style="padding:10px 0 0 10px">
+            <div class="form-row">
+                <label style="width: 100px !important;" for="node-config-input-closeTopic"><i class="fa fa-tasks"></i> <span
+                        data-i18n="common.label.topic"></span></label>
+                <input style="width: calc(100% - 300px) !important" type="text" id="node-config-input-closeTopic"
+                    style="width:300px" data-i18n="[placeholder]ff-mqtt.placeholder.close-topic">
+                <label style="margin-left: 10px; width: 90px !important;" for="node-config-input-closeRetain"><i
+                        class="fa fa-history"></i> <span data-i18n="ff-mqtt.label.retain"></span></label>
+                <select id="node-config-input-closeRetain" style="width:75px !important">
+                    <option value="false" data-i18n="ff-mqtt.false"></option>
+                    <option value="true" data-i18n="ff-mqtt.true"></option>
+                </select>
+            </div>
+            <div class="form-row">
+                <label style="width: 100px !important;" for="node-config-input-closePayload"><i class="fa fa-envelope"></i>
+                    <span data-i18n="common.label.payload"></span></label>
+                <input style="width: calc(100% - 300px) !important" type="text" id="node-config-input-closePayload"
+                    style="width:300px" data-i18n="[placeholder]common.label.payload">
+                <label style="margin-left: 10px; width: 90px !important;" for="node-config-input-closeQos"><i
+                        class="fa fa-empire"></i> <span data-i18n="ff-mqtt.label.qos"></span></label>
+                <select id="node-config-input-closeQos" style="width:75px !important">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                </select>
+            </div>
+            <div class="form-row mqtt5 mqtt5-out">
+                <label for="node-config-input-close-contentType" data-i18n="ff-mqtt.label.contentType"></label>
+                <input type="text" style="width:calc(100% - 200px);" id="node-config-input-close-contentType">
+            </div>
+            <div class="form-row mqtt5 mqtt5-out">
+                <label for="node-config-input-close-props" data-i18n="ff-mqtt.label.userProperties"></label>
+                <input type="text" style="width:calc(100% - 200px);" id="node-config-input-close-props">
+            </div>
+            <div class="form-row mqtt5 mqtt5-out">
+                <label for="node-config-input-close-respTopic"><span data-i18n="ff-mqtt.label.responseTopic"></span></label>
+                <input type="text" id="node-config-input-close-respTopic" style="width: calc(100% - 200px);">
+            </div>
+            <div class="form-row mqtt5 mqtt5-out">
+                <label for="node-config-input-close-correl"><span data-i18n="ff-mqtt.label.correlationData"></span></label>
+                <input type="text" id="node-config-input-close-correl" style="width: calc(100% - 200px);">
+            </div>
+            <div class="form-row mqtt5 mqtt5-out">
+                <label for="node-config-input-close-expiry"><span data-i18n="ff-mqtt.label.expiry"></span></label>
+                <input id="node-config-input-close-expiry" style="width: calc(100% - 200px);">
+            </div>
+        </div>
+    </div>
+    <div id="mqtt-broker-section-will">
+        <div class="red-ui-palette-header">
+            <i class="fa fa-angle-down"></i><span data-i18n="ff-mqtt.sections-label.will-message"></span>
+        </div>
+        <div class="section-content" style="padding:10px 0 0 10px">
+            <div class="form-row">
+                <label style="width: 100px !important;" for="node-config-input-willTopic"><i class="fa fa-tasks"></i> <span
+                        data-i18n="common.label.topic"></span></label>
+                <input style="width: calc(100% - 300px) !important" type="text" id="node-config-input-willTopic"
+                    style="width:300px" data-i18n="[placeholder]ff-mqtt.placeholder.will-topic">
+                <label style="margin-left: 10px; width: 90px !important;" for="node-config-input-willRetain"><i
+                        class="fa fa-history"></i> <span data-i18n="ff-mqtt.label.retain"></span></label>
+                <select id="node-config-input-willRetain" style="width:75px !important">
+                    <option value="false" data-i18n="ff-mqtt.false"></option>
+                    <option value="true" data-i18n="ff-mqtt.true"></option>
+                </select>
+            </div>
+            <div class="form-row">
+                <label style="width: 100px !important;" for="node-config-input-willPayload"><i class="fa fa-envelope"></i>
+                    <span data-i18n="common.label.payload"></span></label>
+                <input style="width: calc(100% - 300px) !important" type="text" id="node-config-input-willPayload"
+                    style="width:300px" data-i18n="[placeholder]common.label.payload">
+                <label style="margin-left: 10px; width: 90px !important;" for="node-config-input-willQos"><i
+                        class="fa fa-empire"></i> <span data-i18n="ff-mqtt.label.qos"></span></label>
+                <select id="node-config-input-willQos" style="width:75px !important">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                </select>
+            </div>
+            <div class="form-row mqtt5">
+                <label><span data-i18n="ff-mqtt.label.delay"></span></label>
+                <input type="number" min="0" id="node-config-input-will-delay" style="width: 100px">
+            </div>
+            <div class="form-row mqtt5 mqtt5-out">
+                <label for="node-config-input-will-contentType" data-i18n="ff-mqtt.label.contentType"></label>
+                <input type="text" style="width:calc(100% - 200px);" id="node-config-input-will-contentType">
+            </div>
+            <div class="form-row mqtt5 mqtt5-out">
+                <label for="node-config-input-will-props" data-i18n="ff-mqtt.label.userProperties"></label>
+                <input type="text" style="width:calc(100% - 200px);" id="node-config-input-will-props">
+            </div>
+            <div class="form-row mqtt5 mqtt5-out">
+                <label for="node-config-input-will-respTopic"><span data-i18n="ff-mqtt.label.responseTopic"></span></label>
+                <input type="text" id="node-config-input-will-respTopic" style="width: calc(100% - 200px);">
+            </div>
+            <div class="form-row mqtt5 mqtt5-out">
+                <label for="node-config-input-will-correl"><span data-i18n="ff-mqtt.label.correlationData"></span></label>
+                <input type="text" id="node-config-input-will-correl" style="width: calc(100% - 200px);">
+            </div>
+            <div class="form-row mqtt5 mqtt5-out">
+                <label for="node-config-input-will-expiry"><span data-i18n="ff-mqtt.label.expiry"></span></label>
+                <input id="node-config-input-will-expiry" style="width: calc(100% - 200px);">
+            </div>
+        </div>
+    </div>
+</script>
+
 <script type="text/javascript">
 /* global RED, $ */
 (function () {
+    // convert to i18 text
+    const getLocalTranslation = (path) => {
+        return RED._('@flowfuse/nr-mqtt-nodes/ff-mqtt:' + path)
+    }
     const typedInputNoneOpt = {
         value: 'none',
-        label: RED._('ff-mqtt.label.none'),
+        label: getLocalTranslation('ff-mqtt.label.none'),
         hasValue: false
     }
     const makeTypedInputOpt = function (value) {
@@ -251,7 +426,7 @@ The copyright notice for this fork is the same as the original.
         makeTypedInputOpt('text/plain'),
         {
             value: 'other',
-            label: RED._('ff-mqtt.label.other'),
+            label: getLocalTranslation('ff-mqtt.label.other'),
             icon: 'red/images/typedInput/az.svg'
         }
     ]
@@ -278,7 +453,7 @@ The copyright notice for this fork is the same as the original.
         if (!topic || topic === '' || !/[\\+#\b\f\n\r\t\v\0]/.test(topic)) {
             return true
         }
-        return RED._('ff-mqtt.errors.invalid-topic')
+        return getLocalTranslation('ff-mqtt.errors.invalid-topic')
     }
     function setupTopicField (node, input) {
         input.autoComplete({
@@ -288,6 +463,15 @@ The copyright notice for this fork is the same as the original.
                 node
             }
         })
+    }
+    function mapDefaults (defaults) {
+        const values = {}
+        for (const key in defaults) {
+            if (Object.prototype.hasOwnProperty.call(defaults, key)) {
+                values[key] = defaults[key].value
+            }
+        }
+        return values
     }
     RED.nodes.registerType('ff-mqtt-in', {
         category: 'FlowFuse',
@@ -304,7 +488,7 @@ The copyright notice for this fork is the same as the original.
                     if (isDynamic || ((!!v) && RED.validators.regex(/^(#$|(\\+|[^+#]*)(\/(\+|[^+#]*))*(\/(\+|#|[^+#]*))?$)/)(v))) {
                         return true
                     }
-                    return RED._('ff-mqtt.errors.invalid-topic')
+                    return getLocalTranslation('ff-mqtt.errors.invalid-topic')
                 }
             },
             qos: { value: '2' },
@@ -312,7 +496,8 @@ The copyright notice for this fork is the same as the original.
             nl: { value: false },
             rap: { value: true },
             rh: { value: 0 },
-            inputs: { value: 0 }
+            inputs: { value: 0 },
+            lwt: { type: 'ff-mqtt-conf' }
         },
         color: '#d8bfd8',
         inputs: 0,
@@ -357,6 +542,10 @@ The copyright notice for this fork is the same as the original.
                 $('div.form-row.form-row-mqtt-static').toggleClass('form-row-mqtt-static-disabled', !!dynamic)
             }
 
+            $('#node-input-lwt-placeholder').on('click', function () {
+                RED.editor.editConfig('', 'ff-mqtt-conf', node.lwt)
+            })
+
             // $('#node-input-broker').on('change', function (d) {
             //     updateVisibility()
             // })
@@ -399,7 +588,8 @@ The copyright notice for this fork is the same as the original.
             contentType: { value: '' },
             userProps: { value: '' },
             correl: { value: '' },
-            expiry: { value: '' }
+            expiry: { value: '' },
+            lwt: { type: 'ff-mqtt-conf' }
         },
         color: '#d8bfd8',
         inputs: 1,
@@ -438,6 +628,10 @@ The copyright notice for this fork is the same as the original.
                     $('div.form-row.mqtt5').hide()
                 }
             }
+
+            $('#node-input-lwt-placeholder').on('click', function () {
+                RED.editor.editConfig('', 'ff-mqtt-conf', that.lwt)
+            })
 
             // $('#node-input-broker').on('change', function (d) {
             showHideDynamicFields()
@@ -481,6 +675,261 @@ The copyright notice for this fork is the same as the original.
         },
         labelStyle: function () {
             return this.name ? 'node_label_italic' : ''
+        }
+    })
+
+    RED.nodes.registerType('ff-mqtt-conf', {
+        category: 'config',
+        defaults: {
+            birthTopic: { value: '', validate: validateMQTTPublishTopic },
+            birthQos: { value: '0' },
+            birthRetain: { value: 'false' },
+            birthPayload: { value: '' },
+            birthMsg: { value: {} },
+            closeTopic: { value: '', validate: validateMQTTPublishTopic },
+            closeQos: { value: '0' },
+            closeRetain: { value: 'false' },
+            closePayload: { value: '' },
+            closeMsg: { value: {} },
+            willTopic: { value: '', validate: validateMQTTPublishTopic },
+            willQos: { value: '0' },
+            willRetain: { value: 'false' },
+            willPayload: { value: '' },
+            willMsg: { value: {} }
+        },
+        label: function () {
+            return 'Team Broker LWT'
+        },
+        oneditprepare: function () {
+            function setUpSection (sectionId, v5Opts, isExpanded) {
+                const birthMessageSection = $('#mqtt-broker-section-' + sectionId)
+                const paletteHeader = birthMessageSection.find('.red-ui-palette-header')
+                const twistie = paletteHeader.find('i')
+                const sectionContent = birthMessageSection.find('.section-content')
+
+                function toggleSection (expanded) {
+                    twistie.toggleClass('expanded', expanded)
+                    sectionContent.toggle(expanded)
+                }
+                paletteHeader.on('click', function (e) {
+                    e.preventDefault()
+                    const isExpanded = twistie.hasClass('expanded')
+                    toggleSection(!isExpanded)
+                })
+                toggleSection(isExpanded)
+                $('#node-config-input-' + sectionId + '-contentType').val(v5Opts ? v5Opts.contentType : '').typedInput({
+                    default: getDefaultContentType(v5Opts ? v5Opts.contentType : ''),
+                    types: contentTypeOpts
+                })
+
+                $('#node-config-input-' + sectionId + '-props').val(v5Opts ? v5Opts.userProps : '').typedInput({
+                    default: !(v5Opts ? v5Opts.userProps : null) ? 'none' : 'json',
+                    types: [typedInputNoneOpt, 'json']
+                })
+                $('#node-config-input-' + sectionId + '-respTopic').val(v5Opts ? v5Opts.respTopic : '').typedInput({
+                    default: !(v5Opts ? v5Opts.respTopic : null) ? 'none' : 'str',
+                    types: [typedInputNoneOpt, 'str']
+                })
+                $('#node-config-input-' + sectionId + '-correl').val(v5Opts ? v5Opts.correl : '').typedInput({
+                    default: !(v5Opts ? v5Opts.correl : null) ? 'none' : 'str',
+                    types: [typedInputNoneOpt, 'str']
+                })
+                $('#node-config-input-' + sectionId + '-expiry').val(v5Opts ? v5Opts.expiry : '').typedInput({
+                    default: !(v5Opts ? v5Opts.expiry : null) ? 'none' : 'num',
+                    types: [typedInputNoneOpt, 'num']
+                })
+            }
+
+            // show first section if none are set so the user gets the idea
+            const showBirthSection = this.birthTopic !== '' ||
+                (
+                    this.willTopic === '' &&
+                    this.birthTopic === '' &&
+                    this.closeTopic === ''
+                )
+            setUpSection('birth', this.birthMsg, showBirthSection)
+            setUpSection('close', this.closeMsg, this.closeTopic !== '')
+            setUpSection('will', this.willMsg, this.willTopic !== '')
+
+            if (this.willMsg) {
+                $('#node-config-input-will-delay').val(this.willMsg.delay)
+            }
+        },
+        oneditsave: function () {
+            const saveLWTMessage = (section) => {
+                const msg = {}
+                if ($('#node-config-input-' + section + 'Topic').val().trim().length > 0) {
+                    let contentType = $('#node-config-input-' + section + '-contentType').val().trim()
+                    if (contentType === '') {
+                        contentType = $('#node-config-input-' + section + '-contentType').typedInput('type')
+                        if (contentType === 'none' || contentType === 'other') {
+                            contentType = ''
+                        }
+                    }
+                    if (contentType) {
+                        msg.contentType = contentType
+                    }
+                    const props = $('#node-config-input-' + section + '-props').val().trim()
+                    if (props) {
+                        msg.userProps = props
+                    }
+                    const resp = $('#node-config-input-' + section + '-respTopic').val().trim()
+                    if (props) {
+                        msg.respTopic = resp
+                    }
+                    const correl = $('#node-config-input-' + section + '-correl').val().trim()
+                    if (correl) {
+                        msg.correl = correl
+                    }
+                    const expiry = $('#node-config-input-' + section + '-expiry').val().trim()
+                    if (expiry) {
+                        msg.expiry = expiry
+                    }
+                }
+                return msg
+            }
+
+            this.birthMsg = saveLWTMessage('birth')
+            this.closeMsg = saveLWTMessage('close')
+            this.willMsg = saveLWTMessage('will')
+            const willDelay = $('#node-config-input-will-delay').val()
+            if (willDelay) {
+                this.willMsg.delay = willDelay
+            }
+        }
+    })
+
+    function debounce (func, wait, immediate) {
+        let timeout
+        return function () {
+            const context = this
+            const args = arguments
+            const later = function () {
+                timeout = null
+                if (!immediate) func.apply(context, args)
+            }
+            const callNow = immediate && !timeout
+            clearTimeout(timeout)
+            timeout = setTimeout(later, wait)
+            if (callNow) func.apply(context, args)
+        }
+    }
+
+    function singletonLWTConfig () {
+        let historyModified = false
+        let doRedraw = false
+        const historyEvents = {
+            t: 'multi',
+            events: [],
+            dirty: RED.nodes.dirty()
+        }
+
+        // first find any existing ff-mqtt-in or ff-mqtt-out nodes and note their LWT config
+        const ffMqttNodes = []
+        RED.nodes.eachNode((n) => {
+            if (n.type === 'ff-mqtt-in' || n.type === 'ff-mqtt-out') {
+                ffMqttNodes.push(n)
+            }
+        })
+
+        // Now gather all ff-mqtt-conf nodes
+        const ffConf = []
+        RED.nodes.eachConfig((n) => {
+            if (n.type === 'ff-mqtt-conf') {
+                ffConf.push(n)
+            }
+        })
+
+        let firstLwtNode
+        if (ffConf.length > 0) {
+            firstLwtNode = ffConf[0]
+            ffConf.splice(0, 1)
+        }
+
+        // Remove all other ff-mqtt-conf nodes
+        while (ffConf.length > 0) {
+            const n = ffConf.pop()
+            RED.nodes.remove(n.id)
+            RED.nodes.dirty(true)
+            doRedraw = true
+        }
+
+        // if there is no LWT node, create one
+        if (!firstLwtNode) {
+            doRedraw = true
+            const lwtConf = RED.nodes.getType('ff-mqtt-conf')
+            firstLwtNode = {
+                _def: lwtConf,
+                id: RED.nodes.id(),
+                type: 'ff-mqtt-conf',
+                ...mapDefaults(lwtConf.defaults),
+                users: []
+            }
+            firstLwtNode.dirty = true
+            firstLwtNode.changed = true
+            RED.nodes.add(firstLwtNode) // pass in an option we can inspect later in the event handler
+            RED.editor.validateNode(firstLwtNode)
+
+            // now, peek RED.history to see if the last action was adding an ff-mqtt-in or ff-mqtt-out node,
+            // update that history entry to also include addition of this LWT node, so undo works as expected
+            const lastHistoryEntry = RED.history.peek()
+            if (lastHistoryEntry && lastHistoryEntry.t === 'add' && lastHistoryEntry.nodes?.length > 0) {
+                const lastNode = RED.nodes.node(lastHistoryEntry.nodes[0])
+                if (lastNode && (lastNode.type === 'ff-mqtt-in' || lastNode.type === 'ff-mqtt-out')) {
+                    lastHistoryEntry.nodes.push(firstLwtNode.id)
+                    historyEvents.events = [lastHistoryEntry]
+                    historyEvents.dirty = lastHistoryEntry.dirty
+                    historyModified = true
+                }
+            }
+
+            // if history wasnt updated, we need to add a new history event for this new LWT node to support undo
+            if (!historyModified) {
+                historyEvents.events.push({
+                    t: 'add',
+                    nodes: [firstLwtNode.id],
+                    dirty: RED.nodes.dirty()
+                })
+            }
+        }
+
+        // Update all in/out nodes to use the singleton LWT
+        if (firstLwtNode) {
+            const lwtNodeId = firstLwtNode.id
+            for (const n of ffMqttNodes) {
+                if (n.lwt !== lwtNodeId) {
+                    doRedraw = true
+                    n.lwt = lwtNodeId
+                    n.dirty = true
+                    n.changed = true
+                    RED.editor.validateNode(n)
+                    RED.nodes.updateConfigNodeUsers(n, { action: 'add', emitEvent: false }) // update the users list on the LWT node
+                    RED.nodes.dirty(true)
+                }
+            }
+        }
+
+        // commit the history event (if we made any changes)
+        if (historyEvents.events.length > 0) {
+            if (historyModified) {
+                RED.history.replace(historyEvents)
+            } else {
+                RED.history.push(historyEvents)
+            }
+        }
+
+        if (doRedraw) {
+            RED.sidebar.config.refresh()
+            RED.view.redraw()
+        }
+    }
+
+    // Create a single debounced instance
+    const debouncedSingletonLWTConfig = debounce(singletonLWTConfig, 25)
+
+    RED.events.on('nodes:add', function (node) {
+        if (node && node.type && node.type.startsWith('ff-mqtt')) {
+            debouncedSingletonLWTConfig(node)
         }
     })
 })()
