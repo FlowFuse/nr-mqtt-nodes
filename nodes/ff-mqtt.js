@@ -1810,7 +1810,7 @@ module.exports = function (RED) {
                                 node.__lastErrorMessage = text
                             }
                         } else if (node.__lastErrorMessage) {
-                            node.brokerConn.updateStatus(node, false)
+                            updateStatus(node, false)
                             node.__lastErrorMessage = null
                         }
                         done(err)
