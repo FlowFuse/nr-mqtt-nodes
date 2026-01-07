@@ -1466,12 +1466,11 @@ module.exports = function (RED) {
             }
         }
 
-        // no `on` or `close` handlers for the static broker node
-        // node.on('close', function (done) {
-        //     node.disconnect(function () {
-        //         done()
-        //     })
-        // })
+        node.on('close', function (done) {
+            node.disconnect(function () {
+                done()
+            })
+        })
 
         // fake the node.status function if it is not already defined
         if (typeof node.status !== 'function') {
