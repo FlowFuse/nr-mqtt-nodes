@@ -699,6 +699,61 @@ The copyright notice for this fork is the same as the original.
         },
         label: function () {
             return 'Team Broker LWT'
+        },
+        oneditprepare: function () {
+            function setUpSection (sectionId, v5Opts, isExpanded) {
+                const birthMessageSection = $('#mqtt-broker-section-' + sectionId)
+                const paletteHeader = birthMessageSection.find('.red-ui-palette-header')
+                const twistie = paletteHeader.find('i')
+                const sectionContent = birthMessageSection.find('.section-content')
+
+                function toggleSection (expanded) {
+                    twistie.toggleClass('expanded', expanded)
+                    sectionContent.toggle(expanded)
+                }
+                paletteHeader.on('click', function (e) {
+                    e.preventDefault()
+                    const isExpanded = twistie.hasClass('expanded')
+                    toggleSection(!isExpanded)
+                })
+                toggleSection(isExpanded)
+                $('#node-config-input-' + sectionId + '-contentType').val(v5Opts ? v5Opts.contentType : '').typedInput({
+                    default: getDefaultContentType(v5Opts ? v5Opts.contentType : ''),
+                    types: contentTypeOpts
+                })
+
+                $('#node-config-input-' + sectionId + '-props').val(v5Opts ? v5Opts.userProps : '').typedInput({
+                    default: !(v5Opts ? v5Opts.userProps : null) ? 'none' : 'json',
+                    types: [typedInputNoneOpt, 'json']
+                })
+                $('#node-config-input-' + sectionId + '-respTopic').val(v5Opts ? v5Opts.respTopic : '').typedInput({
+                    default: !(v5Opts ? v5Opts.respTopic : null) ? 'none' : 'str',
+                    types: [typedInputNoneOpt, 'str']
+                })
+                $('#node-config-input-' + sectionId + '-correl').val(v5Opts ? v5Opts.correl : '').typedInput({
+                    default: !(v5Opts ? v5Opts.correl : null) ? 'none' : 'str',
+                    types: [typedInputNoneOpt, 'str']
+                })
+                $('#node-config-input-' + sectionId + '-expiry').val(v5Opts ? v5Opts.expiry : '').typedInput({
+                    default: !(v5Opts ? v5Opts.expiry : null) ? 'none' : 'num',
+                    types: [typedInputNoneOpt, 'num']
+                })
+            }
+
+            // show first section if none are set so the user gets the idea
+            const showBirthSection = this.birthTopic !== '' ||
+                (
+                    this.willTopic === '' &&
+                    this.birthTopic === '' &&
+                    this.closeTopic === ''
+                )
+            setUpSection('birth', this.birthMsg, showBirthSection)
+            setUpSection('close', this.closeMsg, this.closeTopic !== '')
+            setUpSection('will', this.willMsg, this.willTopic !== '')
+
+            if (this.willMsg) {
+                $('#node-config-input-will-delay').val(this.willMsg.delay)
+            }
         }
     })
 
