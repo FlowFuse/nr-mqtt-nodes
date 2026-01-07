@@ -201,7 +201,6 @@ describe('FF MQTT Nodes', function () {
         return !skipTests ? it(title, test) : it.skip(title, test)
     }
     itConditional.skip = it.skip
-    // eslint-disable-next-line no-only-tests/no-only-tests
     itConditional.only = it.only
 
     // #region ################### BASIC TESTS ################### #//
