@@ -1105,7 +1105,6 @@ module.exports = function (RED) {
                     node._clientOn('error', function (error) {
                     })
                 } catch (err) {
-                    // eslint-disable-next-line no-console
                     console.error(err)
                 }
             }
