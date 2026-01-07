@@ -716,6 +716,7 @@ The copyright notice for this fork is the same as the original.
 
     function singletonLWTConfig () {
         let historyModified = false
+        let doRedraw = false
         const historyEvents = {
             t: 'multi',
             events: [],
@@ -749,10 +750,12 @@ The copyright notice for this fork is the same as the original.
             const n = ffConf.pop()
             RED.nodes.remove(n.id)
             RED.nodes.dirty(true)
+            doRedraw = true
         }
 
         // if there is no LWT node, create one
         if (!firstLwtNode) {
+            doRedraw = true
             const lwtConf = RED.nodes.getType('ff-mqtt-conf')
             firstLwtNode = {
                 _def: lwtConf,
@@ -794,12 +797,12 @@ The copyright notice for this fork is the same as the original.
             const lwtNodeId = firstLwtNode.id
             for (const n of ffMqttNodes) {
                 if (n.lwt !== lwtNodeId) {
+                    doRedraw = true
                     n.lwt = lwtNodeId
                     n.dirty = true
                     n.changed = true
                     RED.editor.validateNode(n)
-                    RED.nodes.updateConfigNodeUsers(n, { action: 'add' }) // update the users list on the LWT node
-                    RED.sidebar.config.refresh() // in case the config panel is open
+                    RED.nodes.updateConfigNodeUsers(n, { action: 'add', emitEvent: false }) // update the users list on the LWT node
                     RED.nodes.dirty(true)
                 }
             }
@@ -812,6 +815,11 @@ The copyright notice for this fork is the same as the original.
             } else {
                 RED.history.push(historyEvents)
             }
+        }
+
+        if (doRedraw) {
+            RED.sidebar.config.refresh()
+            RED.view.redraw()
         }
     }
 
