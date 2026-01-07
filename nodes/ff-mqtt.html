@@ -754,6 +754,48 @@ The copyright notice for this fork is the same as the original.
             if (this.willMsg) {
                 $('#node-config-input-will-delay').val(this.willMsg.delay)
             }
+        },
+        oneditsave: function () {
+            const saveLWTMessage = (section) => {
+                const msg = {}
+                if ($('#node-config-input-' + section + 'Topic').val().trim().length > 0) {
+                    let contentType = $('#node-config-input-' + section + '-contentType').val().trim()
+                    if (contentType === '') {
+                        contentType = $('#node-config-input-' + section + '-contentType').typedInput('type')
+                        if (contentType === 'none' || contentType === 'other') {
+                            contentType = ''
+                        }
+                    }
+                    if (contentType) {
+                        msg.contentType = contentType
+                    }
+                    const props = $('#node-config-input-' + section + '-props').val().trim()
+                    if (props) {
+                        msg.userProps = props
+                    }
+                    const resp = $('#node-config-input-' + section + '-respTopic').val().trim()
+                    if (props) {
+                        msg.respTopic = resp
+                    }
+                    const correl = $('#node-config-input-' + section + '-correl').val().trim()
+                    if (correl) {
+                        msg.correl = correl
+                    }
+                    const expiry = $('#node-config-input-' + section + '-expiry').val().trim()
+                    if (expiry) {
+                        msg.expiry = expiry
+                    }
+                }
+                return msg
+            }
+
+            this.birthMsg = saveLWTMessage('birth')
+            this.closeMsg = saveLWTMessage('close')
+            this.willMsg = saveLWTMessage('will')
+            const willDelay = $('#node-config-input-will-delay').val()
+            if (willDelay) {
+                this.willMsg.delay = willDelay
+            }
         }
     })
 
