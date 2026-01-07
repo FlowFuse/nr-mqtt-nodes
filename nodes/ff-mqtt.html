@@ -401,9 +401,13 @@ The copyright notice for this fork is the same as the original.
 <script type="text/javascript">
 /* global RED, $ */
 (function () {
+    // convert to i18 text
+    const getLocalTranslation = (path) => {
+        return RED._('@flowfuse/nr-mqtt-nodes/ff-mqtt:' + path)
+    }
     const typedInputNoneOpt = {
         value: 'none',
-        label: RED._('ff-mqtt.label.none'),
+        label: getLocalTranslation('ff-mqtt.label.none'),
         hasValue: false
     }
     const makeTypedInputOpt = function (value) {
@@ -422,7 +426,7 @@ The copyright notice for this fork is the same as the original.
         makeTypedInputOpt('text/plain'),
         {
             value: 'other',
-            label: RED._('ff-mqtt.label.other'),
+            label: getLocalTranslation('ff-mqtt.label.other'),
             icon: 'red/images/typedInput/az.svg'
         }
     ]
@@ -449,7 +453,7 @@ The copyright notice for this fork is the same as the original.
         if (!topic || topic === '' || !/[\\+#\b\f\n\r\t\v\0]/.test(topic)) {
             return true
         }
-        return RED._('ff-mqtt.errors.invalid-topic')
+        return getLocalTranslation('ff-mqtt.errors.invalid-topic')
     }
     function setupTopicField (node, input) {
         input.autoComplete({
@@ -484,7 +488,7 @@ The copyright notice for this fork is the same as the original.
                     if (isDynamic || ((!!v) && RED.validators.regex(/^(#$|(\\+|[^+#]*)(\/(\+|[^+#]*))*(\/(\+|#|[^+#]*))?$)/)(v))) {
                         return true
                     }
-                    return RED._('ff-mqtt.errors.invalid-topic')
+                    return getLocalTranslation('ff-mqtt.errors.invalid-topic')
                 }
             },
             qos: { value: '2' },
