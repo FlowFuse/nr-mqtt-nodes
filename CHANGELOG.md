@@ -1,4 +1,4 @@
-### 0.2.3 Release
+### 0.3.0 Release
 
  - Adding LWT/Birth/Death messages (#52) @hardillb
  - Bump globals from 16.5.0 to 17.0.0 (#66) @app/dependabot
