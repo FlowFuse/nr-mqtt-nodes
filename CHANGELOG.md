@@ -1,3 +1,16 @@
+### 0.3.0 Release
+
+ - Adding LWT/Birth/Death messages (#52) @hardillb
+ - Bump globals from 16.5.0 to 17.0.0 (#66) @app/dependabot
+ - Bump JS-DevTools/npm-publish from 4.1.1 to 4.1.2 (#65) @app/dependabot
+ - Bump flowfuse/github-actions-workflows/.github/workflows/publish_node_package.yml from 0.44.0 to 0.45.0 (#61) @app/dependabot
+ - Bump flowfuse/github-actions-workflows/.github/workflows/build_node_package.yml from 0.44.0 to 0.45.0 (#60) @app/dependabot
+ - Bump sinon from 21.0.0 to 21.0.1 (#62) @app/dependabot
+ - Fix quotes and eqeqeq (#68) @hardillb
+ - convert to eslint v9 (#64) @hardillb
+ - Bump flowfuse/github-actions-workflows/.github/workflows/build_node_package.yml from 0.43.0 to 0.44.0 (#57) @app/dependabot
+ - Bump flowfuse/github-actions-workflows/.github/workflows/publish_node_package.yml from 0.43.0 to 0.44.0 (#56) @app/dependabot
+
 ### 0.2.2 Release
 
 - Bump actions/setup-node from 6.0.0 to 6.1.0 (#54) @app/dependabot
