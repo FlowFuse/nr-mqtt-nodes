@@ -1,3 +1,5 @@
+# CHANGELOG
+
 ### 0.3.0 Release
 
  - Adding LWT/Birth/Death messages (#52) @hardillb
