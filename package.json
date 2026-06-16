@@ -37,7 +37,7 @@
         "mocha": "^11.6.0",
         "mocha-cli": "^1.0.1",
         "neostandard": "^0.12.2",
-        "node-red": "^4.1.0",
+        "node-red": "^5.0.0",
         "node-red-node-test-helper": "^0.3.5",
         "sinon": "^21.0.0"
     },
