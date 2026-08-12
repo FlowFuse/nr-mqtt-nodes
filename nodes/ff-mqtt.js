@@ -53,8 +53,8 @@ module.exports = function (RED) {
     }
 
     if (process.env['FFNODE_DISABLE_MQTT'] && process.env['FFNODE_DISABLE_MQTT'] === 'true') {
-		return
-	}
+        return
+    }
 
     const TEAM_CLIENT_AUTH_ID = createNrMqttId(forgeSettings.teamID, instanceType, instanceId) // e.g., 'mq:remote:teamId:deviceId' or 'mq:hosted:teamId:projectId:haId'
     const TEAM_CLIENT_CLIENT_ID = createNrMqttClientId(forgeSettings.teamID, instanceType, instanceId, haInstanceId) // e.g., 'mq:remote:deviceId' or 'mq:hosted:projectId:haId'
