@@ -53,6 +53,7 @@ module.exports = function (RED) {
     }
 
     if (process.env['FFNODE_DISABLE_MQTT'] === 'true') {
+        RED.log.warn('@flowfuse/nr-mqtt-nodes: node disabled');
         return
     }
 
