@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [0.4.0](https://github.com/FlowFuse/nr-mqtt-nodes/compare/v0.3.0...v0.4.0) (2026-08-24)
+
+
+### Features
+
+* Add kill switch env var ([#181](https://github.com/FlowFuse/nr-mqtt-nodes/issues/181)) ([04f0b6f](https://github.com/FlowFuse/nr-mqtt-nodes/commit/04f0b6f6eb04e5b1d7eec2f42ec1bb57d18b8564))
+
 ### 0.3.0 Release
 
  - Adding LWT/Birth/Death messages (#52) @hardillb
@@ -45,4 +52,4 @@
 
 ### 0.1.0 Release
 
- - Initial release 
+ - Initial release
