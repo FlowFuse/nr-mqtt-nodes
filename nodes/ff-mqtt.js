@@ -52,7 +52,7 @@ module.exports = function (RED) {
         throw new Error('FlowFuse MQTT nodes cannot be loaded due to missing instance information')
     }
 
-    if (process.env['FFNODE_DISABLE_MQTT'] && process.env['FFNODE_DISABLE_MQTT'] === 'true') {
+    if (process.env['FFNODE_DISABLE_MQTT'] === 'true') {
         return
     }
 
