@@ -54,7 +54,7 @@ module.exports = function (RED) {
 
     if (process.env['FFNODE_DISABLE_MQTT'] === 'true') {
         RED.log.warn('@flowfuse/nr-mqtt-nodes: node disabled')
-        return
+        throw new Error('disabled')
     }
 
     const TEAM_CLIENT_AUTH_ID = createNrMqttId(forgeSettings.teamID, instanceType, instanceId) // e.g., 'mq:remote:teamId:deviceId' or 'mq:hosted:teamId:projectId:haId'
