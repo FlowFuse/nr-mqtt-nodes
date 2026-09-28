@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [0.4.1](https://github.com/FlowFuse/nr-mqtt-nodes/compare/v0.4.0...v0.4.1) (2026-09-28)
+
+
+### Bug Fixes
+
+* Throw error when disabling ([#205](https://github.com/FlowFuse/nr-mqtt-nodes/issues/205)) ([f75b5bd](https://github.com/FlowFuse/nr-mqtt-nodes/commit/f75b5bd51e2b74256d5e9f5ce9ef94b023b58a8c))
+
 ## [0.4.0](https://github.com/FlowFuse/nr-mqtt-nodes/compare/v0.3.0...v0.4.0) (2026-08-24)
 
 
