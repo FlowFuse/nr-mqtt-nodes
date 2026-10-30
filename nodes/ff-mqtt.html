@@ -479,7 +479,7 @@ The copyright notice for this fork is the same as the original.
             name: { value: '' },
             topic: {
                 value: '',
-                validate: function (v, opt) {
+                validate (v, opt) {
                     let isDynamic = this.inputs === 1
                     const topicTypeSelect = $('#node-input-topicType')
                     if (topicTypeSelect.length) {
@@ -504,17 +504,17 @@ The copyright notice for this fork is the same as the original.
         outputs: 1,
         icon: 'ff-logo.svg',
         paletteLabel: 'ff mqtt in',
-        label: function () {
+        label () {
             let label = 'ff mqtt in'
             if (this.topicType !== 'dynamic' && this.topic) {
                 label = this.topic
             }
             return this.name || label
         },
-        labelStyle: function () {
+        labelStyle () {
             return this.name ? 'node_label_italic' : ''
         },
-        oneditprepare: function () {
+        oneditprepare () {
             const node = this
 
             const forgeUrl = RED.settings.ffMqttInUserTeamBrokerClientUrl || RED.settings.ffMqttInForgeUrl || ''
@@ -570,7 +570,7 @@ The copyright notice for this fork is the same as the original.
             }
             updateVisibility()
         },
-        oneditsave: function () {
+        oneditsave () {
             if ($('#node-input-topicType').val() === 'dynamic') {
                 $('#node-input-topic').val('')
             }
@@ -597,10 +597,10 @@ The copyright notice for this fork is the same as the original.
         icon: 'ff-logo.svg',
         paletteLabel: 'ff mqtt out',
         align: 'right',
-        label: function () {
+        label () {
             return this.name || this.topic || 'ff mqtt out'
         },
-        oneditprepare: function () {
+        oneditprepare () {
             const that = this
             const forgeUrl = RED.settings.ffMqttOutUserTeamBrokerClientUrl || RED.settings.ffMqttOutForgeUrl || ''
             $('#ff-mqtt-client-link').attr('href', forgeUrl)
@@ -663,7 +663,7 @@ The copyright notice for this fork is the same as the original.
                 types: contentTypeOpts
             })
         },
-        oneditsave: function () {
+        oneditsave () {
             let contentType = $('#node-input-contentType').val().trim()
             if (contentType === '') {
                 contentType = $('#node-input-contentType').typedInput('type')
@@ -673,7 +673,7 @@ The copyright notice for this fork is the same as the original.
             }
             $('#node-input-contentType').val(contentType)
         },
-        labelStyle: function () {
+        labelStyle () {
             return this.name ? 'node_label_italic' : ''
         }
     })
@@ -697,10 +697,10 @@ The copyright notice for this fork is the same as the original.
             willPayload: { value: '' },
             willMsg: { value: {} }
         },
-        label: function () {
+        label () {
             return 'Team Broker LWT'
         },
-        oneditprepare: function () {
+        oneditprepare () {
             function setUpSection (sectionId, v5Opts, isExpanded) {
                 const birthMessageSection = $('#mqtt-broker-section-' + sectionId)
                 const paletteHeader = birthMessageSection.find('.red-ui-palette-header')
@@ -755,7 +755,7 @@ The copyright notice for this fork is the same as the original.
                 $('#node-config-input-will-delay').val(this.willMsg.delay)
             }
         },
-        oneditsave: function () {
+        oneditsave () {
             const saveLWTMessage = (section) => {
                 const msg = {}
                 if ($('#node-config-input-' + section + 'Topic').val().trim().length > 0) {
