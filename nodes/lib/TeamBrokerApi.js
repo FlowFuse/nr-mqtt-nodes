@@ -34,6 +34,10 @@ function TeamBrokerApi (gotClient, { forgeURL, teamId, instanceType, instanceId,
         },
         timeout: {
             request: API_TIMEOUT
+        },
+        // got@11 retries throw an uncaught `onCancel` error on Node 24 when a request fails to connect
+        retry: {
+            limit: 0
         }
     })
 
