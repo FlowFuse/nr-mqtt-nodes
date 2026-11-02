@@ -159,6 +159,53 @@ describe('FF MQTT Nodes', function () {
         clearInterval(mqttBroker.linkMonitorInterval) // clear the link monitor interval so the test can exit
     })
 
+    describe('broker hostname', function () {
+        /**
+         * Connects the broker node to `brokerURL` and returns the options passed to mqtt.js
+         */
+        async function connectOptions (mqttBroker, brokerURL) {
+            // mqtt 5 exports `connect` as a read only getter that reads it from `MQTT.default`
+            const connectSpy = sinon.spy(require('mqtt').default, 'connect')
+            try {
+                mqttBroker.connected = false
+                mqttBroker.connecting = false
+                mqttBroker.brokerurl = brokerURL
+                mqttBroker.connect()
+                connectSpy.calledOnce.should.be.true()
+                connectSpy.threw().should.be.false()
+                return { ...connectSpy.args[0][1] }
+            } finally {
+                connectSpy.restore()
+            }
+        }
+
+        async function loadBroker () {
+            RED.settings.flowforge.mqttNodes = { featureEnabled: true, broker: { url: 'mqtt://localhost:1', password: 'test' } }
+            const { flow } = buildBasicMQTTSendRecvFlow({ id: 'mqtt.in', topic: 'in_topic', lwt: 'broker.node' }, { id: 'mqtt.out', topic: 'out_topic', lwt: 'broker.node' })
+            await helper.load(mqttNodes, flow)
+            return helper.getNode('mqtt.out').brokerConn
+        }
+
+        it('keeps the brackets of an ipv6 ws broker hostname', async function () {
+            const mqttBroker = await loadBroker()
+            const options = await connectOptions(mqttBroker, 'ws://[::1]:9876')
+            options.should.have.property('hostname', '[::1]')
+        })
+
+        it('leaves the hostname of an ipv6 mqtt broker to mqtt.js', async function () {
+            const mqttBroker = await loadBroker()
+            const options = await connectOptions(mqttBroker, 'mqtt://[::1]:9876')
+            options.should.not.have.property('hostname')
+        })
+
+        it('removes the ws hostname when the broker changes to an mqtt URL', async function () {
+            const mqttBroker = await loadBroker()
+            await connectOptions(mqttBroker, 'ws://[::1]:9876')
+            const options = await connectOptions(mqttBroker, 'mqtt://localhost:9876')
+            options.should.not.have.property('hostname')
+        })
+    })
+
     it('should publish with specified QoS and retain values', async function () {
         this.timeout = 2000
         const { flow } = buildBasicMQTTSendRecvFlow({ id: 'mqtt.in', topic: 'in_topic', lwt: 'broker.node' }, { id: 'mqtt.out', topic: '', lwt: 'broker.node' })
