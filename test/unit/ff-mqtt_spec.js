@@ -159,7 +159,7 @@ describe('FF MQTT Nodes', function () {
         clearInterval(mqttBroker.linkMonitorInterval) // clear the link monitor interval so the test can exit
     })
 
-    describe('broker hostname', function () {
+    describe('broker address', function () {
         /**
          * Connects the broker node to `brokerURL` and returns the options passed to mqtt.js
          */
@@ -173,7 +173,8 @@ describe('FF MQTT Nodes', function () {
                 mqttBroker.connect()
                 connectSpy.calledOnce.should.be.true()
                 connectSpy.threw().should.be.false()
-                return { ...connectSpy.args[0][1] }
+                connectSpy.args[0].should.have.length(1)
+                return { ...connectSpy.args[0][0] }
             } finally {
                 connectSpy.restore()
             }
@@ -189,20 +190,19 @@ describe('FF MQTT Nodes', function () {
         it('keeps the brackets of an ipv6 ws broker hostname', async function () {
             const mqttBroker = await loadBroker()
             const options = await connectOptions(mqttBroker, 'ws://[::1]:9876')
-            options.should.have.property('hostname', '[::1]')
+            options.should.have.properties({ protocol: 'ws', hostname: '[::1]', port: 9876, path: '/' })
         })
 
-        it('leaves the hostname of an ipv6 mqtt broker to mqtt.js', async function () {
+        it('removes the brackets of an ipv6 mqtt broker hostname', async function () {
             const mqttBroker = await loadBroker()
             const options = await connectOptions(mqttBroker, 'mqtt://[::1]:9876')
-            options.should.not.have.property('hostname')
+            options.should.have.properties({ protocol: 'mqtt', hostname: '::1', port: 9876 })
         })
 
-        it('removes the ws hostname when the broker changes to an mqtt URL', async function () {
+        it('passes the path and query of a wss broker URL', async function () {
             const mqttBroker = await loadBroker()
-            await connectOptions(mqttBroker, 'ws://[::1]:9876')
-            const options = await connectOptions(mqttBroker, 'mqtt://localhost:9876')
-            options.should.not.have.property('hostname')
+            const options = await connectOptions(mqttBroker, 'wss://broker.example.com/mqtt?x=1')
+            options.should.have.properties({ protocol: 'wss', hostname: 'broker.example.com', path: '/mqtt?x=1' })
         })
     })
 

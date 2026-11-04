@@ -1020,19 +1020,22 @@ module.exports = function (RED) {
                         node.client.end(true)
                         node._clientRemoveListeners()
                     }
-                    // mqtt.js parses the broker URL with `url.parse`, which removes the square brackets of an
-                    // ipv6 hostname, then builds the ws/wss URL from the hostname again: `ws://[::1]:8083` becomes
-                    // the invalid URL `ws://::1:8083`. `new URL` keeps the brackets, and options take precedence
-                    // over the parsed URL. mqtt/mqtts pass the hostname to `net`/`tls`, which need it without them.
-                    // `node.options` is kept between connections, so the hostname is removed for other URLs.
+                    // mqtt.js parses a broker URL with `url.parse`, which removes the square brackets of an ipv6
+                    // hostname, so `ws://[::1]:8083` would connect to the invalid URL `ws://::1:8083`.
+                    // Parse it here instead and pass only options.
                     // SEE: https://github.com/mqttjs/MQTT.js/issues/1569
                     const brokerAddress = new URL(node.brokerurl)
-                    if (brokerAddress.protocol.startsWith('ws')) {
-                        node.options.hostname = brokerAddress.hostname
-                    } else {
-                        delete node.options.hostname
+                    const protocol = brokerAddress.protocol.replace(/:$/, '')
+                    const host = brokerAddress.hostname
+                    const connectOptions = {
+                        protocol,
+                        // ws/wss build a URL from the hostname, so an ipv6 address keeps its brackets.
+                        // mqtt/mqtts pass it to net/tls, which need it without brackets.
+                        hostname: protocol.startsWith('ws') || !host.startsWith('[') ? host : host.slice(1, -1),
+                        port: brokerAddress.port ? Number(brokerAddress.port) : undefined,
+                        path: brokerAddress.pathname + brokerAddress.search
                     }
-                    node.client = mqtt.connect(node.brokerurl, node.options)
+                    node.client = mqtt.connect({ ...connectOptions, ...node.options })
                     node.client.setMaxListeners(0)
                     let callbackDone = false // prevent re-connects causing node._clientOn('connect' firing callback multiple times
                     // Register successful connect or reconnect handler
