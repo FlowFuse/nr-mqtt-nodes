@@ -159,6 +159,53 @@ describe('FF MQTT Nodes', function () {
         clearInterval(mqttBroker.linkMonitorInterval) // clear the link monitor interval so the test can exit
     })
 
+    describe('broker address', function () {
+        /**
+         * Connects the broker node to `brokerURL` and returns the options passed to mqtt.js
+         */
+        async function connectOptions (mqttBroker, brokerURL) {
+            // mqtt 5 exports `connect` as a read only getter that reads it from `MQTT.default`
+            const connectSpy = sinon.spy(require('mqtt').default, 'connect')
+            try {
+                mqttBroker.connected = false
+                mqttBroker.connecting = false
+                mqttBroker.brokerurl = brokerURL
+                mqttBroker.connect()
+                connectSpy.calledOnce.should.be.true()
+                connectSpy.threw().should.be.false()
+                connectSpy.args[0].should.have.length(1)
+                return { ...connectSpy.args[0][0] }
+            } finally {
+                connectSpy.restore()
+            }
+        }
+
+        async function loadBroker () {
+            RED.settings.flowforge.mqttNodes = { featureEnabled: true, broker: { url: 'mqtt://localhost:1', password: 'test' } }
+            const { flow } = buildBasicMQTTSendRecvFlow({ id: 'mqtt.in', topic: 'in_topic', lwt: 'broker.node' }, { id: 'mqtt.out', topic: 'out_topic', lwt: 'broker.node' })
+            await helper.load(mqttNodes, flow)
+            return helper.getNode('mqtt.out').brokerConn
+        }
+
+        it('keeps the brackets of an ipv6 ws broker hostname', async function () {
+            const mqttBroker = await loadBroker()
+            const options = await connectOptions(mqttBroker, 'ws://[::1]:9876')
+            options.should.have.properties({ protocol: 'ws', hostname: '[::1]', port: 9876, path: '/' })
+        })
+
+        it('removes the brackets of an ipv6 mqtt broker hostname', async function () {
+            const mqttBroker = await loadBroker()
+            const options = await connectOptions(mqttBroker, 'mqtt://[::1]:9876')
+            options.should.have.properties({ protocol: 'mqtt', hostname: '::1', port: 9876 })
+        })
+
+        it('passes the path and query of a wss broker URL', async function () {
+            const mqttBroker = await loadBroker()
+            const options = await connectOptions(mqttBroker, 'wss://broker.example.com/mqtt?x=1')
+            options.should.have.properties({ protocol: 'wss', hostname: 'broker.example.com', path: '/mqtt?x=1' })
+        })
+    })
+
     it('should publish with specified QoS and retain values', async function () {
         this.timeout = 2000
         const { flow } = buildBasicMQTTSendRecvFlow({ id: 'mqtt.in', topic: 'in_topic', lwt: 'broker.node' }, { id: 'mqtt.out', topic: '', lwt: 'broker.node' })
