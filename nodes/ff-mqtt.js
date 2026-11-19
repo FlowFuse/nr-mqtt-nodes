@@ -1020,7 +1020,25 @@ module.exports = function (RED) {
                         node.client.end(true)
                         node._clientRemoveListeners()
                     }
-                    node.client = mqtt.connect(node.brokerurl, node.options)
+                    // Why the broker URL is not passed to mqtt.js:
+                    // - mqtt.js parses it with `url.parse`, which removes the square brackets of an ipv6 hostname,
+                    //   so `ws://[::1]:8883` becomes the invalid URL `ws://::1:8883`
+                    // - mqtt.js v5 ignores a parsed URL object when options are also given, and connects to `mqtt://localhost:1883`
+                    // Instead, the URL is parsed here with `new URL` (which keeps the brackets) and passed to mqtt.js as options.
+                    // SEE: https://github.com/mqttjs/MQTT.js/issues/1569
+                    const brokerAddress = new URL(node.brokerurl)
+                    const protocol = brokerAddress.protocol.replace(/:$/, '')
+                    const host = brokerAddress.hostname
+                    const connectOptions = {
+                        protocol,
+                        // ws/wss build a URL from the hostname, so an ipv6 address keeps its brackets.
+                        // mqtt/mqtts pass the hostname to `net`/`tls`, which need the address without brackets
+                        // (`[::1]` is looked up as a DNS name and fails, and would be sent as the TLS servername)
+                        hostname: protocol.startsWith('ws') || !host.startsWith('[') ? host : host.slice(1, -1),
+                        port: brokerAddress.port ? Number(brokerAddress.port) : undefined, // mqtt.js uses the protocol's default port when not set
+                        path: brokerAddress.pathname + brokerAddress.search
+                    }
+                    node.client = mqtt.connect({ ...connectOptions, ...node.options })
                     node.client.setMaxListeners(0)
                     let callbackDone = false // prevent re-connects causing node._clientOn('connect' firing callback multiple times
                     // Register successful connect or reconnect handler
