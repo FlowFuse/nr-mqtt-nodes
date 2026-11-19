@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [0.4.2](https://github.com/FlowFuse/nr-mqtt-nodes/compare/v0.4.1...v0.4.2) (2026-11-19)
+
+
+### Bug Fixes
+
+* Connect to IPv6 ws and wss broker URLs ([#237](https://github.com/FlowFuse/nr-mqtt-nodes/issues/237)) ([17229aa](https://github.com/FlowFuse/nr-mqtt-nodes/commit/17229aa21a918b8bf48f299716772cc64dd72ac7))
+* Disable got retries in the Team Broker API client ([#232](https://github.com/FlowFuse/nr-mqtt-nodes/issues/232)) ([e52afd8](https://github.com/FlowFuse/nr-mqtt-nodes/commit/e52afd8e47bcbb163ec0932773081ed9d64e88b4))
+
 ## [0.4.1](https://github.com/FlowFuse/nr-mqtt-nodes/compare/v0.4.0...v0.4.1) (2026-09-28)
 
 
